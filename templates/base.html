@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}zin blog{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <header>
+        <nav class="container nav-container">
+            <a href="{% url 'home' %}" class="logo">Mohammed El Zin Highschool</a>
+
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
+                <span></span>
+            </label>
+            <div class="nav-overlay"></div>
+
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'lesson_list' %}">Lessons</a>
+                <a href="{% url 'test_list' %}">Tests</a>
+
+                {% if user.is_authenticated %}
+                {% if user.is_student and user.year and user.stream %}
+                <a href="{% url 'chat_room' year=user.year stream=user.stream %}">Chat</a>
+                {% endif %}
+
+                {% if user.is_staff %}
+                <a href="{% url 'pending_users' %}">Pending Users</a>
+                {% endif %}
+
+                {% if user.is_teacher or user.is_staff %}
+                <a href="{% url 'pending_lessons' %}">Pending Lessons</a>
+                <a href="{% url 'announcement_create' %}">New Announcement</a>
+                {% endif %}
+
+                {% if user.is_teacher %}
+                <a href="{% url 'teacher_dashboard' %}">Dashboard</a>
+                <span class="badge badge-primary">Teacher</span>
+                {% elif user.is_student %}
+                <a href="{% url 'student_dashboard' %}">Dashboard</a>
+                <span class="badge badge-primary">Student</span>
+                {% endif %}
+
+                <a href="{% url 'profile_edit' %}" class="nav-profile">
+                    {% if user.profile_pic %}
+                    <img src="{{ user.profile_pic.url }}" alt="Profile" class="nav-avatar">
+                    {% endif %}
+                    <span>{{ user.nickname|default:user.real_name }}</span>
+                </a>
+
+                <a href="{% url 'logout' %}" class="btn btn-secondary logout-btn">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main class="container fade-in">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="text-center mt-4 mb-4" style="color: var(--text-muted); font-size: 0.875rem;">
+        <p>&copy; 2026 Mohammed El Zin Highschool. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

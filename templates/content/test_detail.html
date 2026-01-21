@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ test.title }}</h1>
+<p>{{ test.description }}</p>
+
+<h3>Questions</h3>
+<ul>
+    {% for question in test.questions.all %}
+    <li>{{ question.text }}</li>
+    {% empty %}
+    <li>No questions yet.</li>
+    {% endfor %}
+</ul>
+
+{% if user == test.author %}
+<a href="{% url 'question_add' test_pk=test.pk %}">Add Question</a>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero fade-in">
+    <h1>Welcome to Mohammed El Zin Highschool</h1>
+    <p>Your platform for interactive learning and assessment. Explore lessons and take tests to improve your knowledge.
+    </p>
+</div>
+
+<div class="grid home-grid" style="grid-template-columns: 2fr 1fr;">
+    <!-- Left Column: News and Lessons -->
+    <div>
+        {% if announcements %}
+        <section class="mb-4">
+            <h2 class="mb-4">School Announcements</h2>
+            <div class="grid grid-cols-1">
+                {% for announcement in announcements %}
+                <div class="card announcement-card">
+                    <div class="flex" style="justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h3>{{ announcement.title }}</h3>
+                            <small class="text-muted" style="display: block; margin-bottom: 0.5rem;">
+                                {{ announcement.created_at|date:"F j, Y - g:i A" }}
+                            </small>
+                            <p>{{ announcement.content|linebreaks }}</p>
+                        </div>
+                        {% if user.is_staff or user == announcement.author %}
+                        <a href="{% url 'delete_announcement' pk=announcement.pk %}" class="btn btn-secondary btn-sm"
+                            onclick="return confirm('Delete this announcement?');">Delete</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section>
+            <h2 class="mb-4">Recent Lessons</h2>
+            <div class="grid grid-cols-1">
+                {% for lesson in lessons %}
+                <article class="card">
+                    <h3>{{ lesson.title }}</h3>
+                    <p class="text-muted">{{ lesson.content|truncatewords:30 }}</p>
+                    <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+                        <small class="text-muted">By {{ lesson.author.username }}</small>
+                        <a href="{% url 'lesson_detail' pk=lesson.pk %}" class="btn btn-primary btn-sm">Read more</a>
+                    </div>
+                </article>
+                {% empty %}
+                <p>No lessons available.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Right Column: Chat Section -->
+    <aside>
+        {% if user.is_authenticated and year and stream %}
+        <div class="chat-container home-chat">
+            <div class="chat-header">
+                <h3>Class Chat</h3>
+                <p>{{ year_display }} - {{ stream_display }}</p>
+            </div>
+
+            <div id="chat-messages" class="chat-messages">
+                <div class="text-center" style="margin-top: 2rem;">
+                    <p class="text-muted">Loading chat...</p>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <form id="chat-form" class="flex" style="gap: 0.5rem;">
+                    {% csrf_token %}
+                    <input type="text" id="message-input" name="message" placeholder="Message..."
+                        class="form-input rounded-pill" required autocomplete="off">
+                    <button type="submit" class="btn btn-primary btn-round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+            <div class="chat-footer">
+                <a href="{% url 'chat_room' year=year stream=stream %}">Open Full Chat</a>
+            </div>
+        </div>
+
+        <script>
+            // Chat logic for Home Page
+            (function () {
+                const chatMessages = document.getElementById('chat-messages');
+                const chatForm = document.getElementById('chat-form');
+                const messageInput = document.getElementById('message-input');
+                let lastMessageId = null;
+
+                function getCsrfToken() {
+                    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+                }
+
+                function createMessageElement(msg) {
+                    const div = document.createElement('div');
+                    div.className = `message-bubble ${msg.is_mine ? 'mine' : 'others'}`;
+                    div.setAttribute('data-id', msg.id);
+                    div.style.maxWidth = '85%';
+
+                    div.innerHTML = `
+                        <div class="message-info" style="font-size: 0.7rem;">
+                            <strong>${msg.author}</strong>
+                            <span>${msg.time}</span>
+                        </div>
+                        <div class="message-text" style="font-size: 0.85rem;">${msg.text}</div>
+                    `;
+                    return div;
+                }
+
+                async function fetchMessages() {
+                    try {
+                        const url = `{% url 'get_messages' year=year stream=stream %}?last_id=${lastMessageId || ''}`;
+                        const response = await fetch(url);
+                        const data = await response.json();
+
+                        if (data.success && data.messages.length > 0) {
+                            if (lastMessageId === null) chatMessages.innerHTML = '';
+
+                            data.messages.forEach(msg => {
+                                chatMessages.appendChild(createMessageElement(msg));
+                                lastMessageId = msg.id;
+                            });
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        } else if (lastMessageId === null && data.messages.length === 0) {
+                            chatMessages.innerHTML = '<p class="text-center" style="color: var(--text-muted); margin-top: 1rem;">No messages yet.</p>';
+                        }
+                    } catch (error) {
+                        console.error('Home chat error:', error);
+                    }
+                }
+
+                chatForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const message = messageInput.value.trim();
+                    if (!message) return;
+
+                    const formData = new FormData();
+                    formData.append('message', message);
+                    formData.append('csrfmiddlewaretoken', getCsrfToken());
+                    messageInput.value = '';
+
+                    try {
+                        const response = await fetch('{% url "send_message" year=year stream=stream %}', {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() },
+                            body: formData
+                        });
+                        const data = await response.json();
+                        if (data.success && !document.querySelector(`[data-id="${data.message.id}"]`)) {
+                            chatMessages.appendChild(createMessageElement(data.message));
+                            lastMessageId = data.message.id;
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
+                    } catch (error) { console.error('Send error:', error); }
+                });
+
+                fetchMessages();
+                setInterval(fetchMessages, 3000);
+            })();
+        </script>
+        {% else %}
+        <div class="card text-center" style="padding: 2rem; background: #f1f5f9;">
+            <p style="color: var(--text-muted);">Please <a href="{% url 'login' %}">login</a> as a student to
+                participate in your class chat.</p>
+        </div>
+        {% endif %}
+    </aside>
+</div>
+{% endblock %}

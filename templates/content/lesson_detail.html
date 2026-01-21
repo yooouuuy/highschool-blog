@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div class="card">
+        <h1 class="mb-4">{{ lesson.title }}</h1>
+        <div class="flex mb-4"
+            style="color: var(--text-muted); font-size: 0.9rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+            <span style="margin-right: 1.5rem;">By {{ lesson.author.username }}</span>
+            <span>{{ lesson.created_at|date:"F j, Y" }}</span>
+        </div>
+        <div class="content" style="font-size: 1.1rem; line-height: 1.8;">
+            {{ lesson.content|linebreaks }}
+        </div>
+    </div>
+    <div class="mt-4">
+        <a href="{% url 'lesson_list' %}" class="btn btn-secondary">&larr; Back to Lessons</a>
+    </div>
+</div>
+{% endblock %}

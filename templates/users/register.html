@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 3rem auto; padding: 0 1rem;">
+    <div class="card" style="padding: 2.5rem; border-top: 5px solid var(--primary); box-shadow: var(--shadow-xl);">
+        <div class="text-center mb-5">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✍️</div>
+            <h2 style="font-size: 2.25rem; margin-bottom: 0.5rem; color: var(--text);">Join Our Community</h2>
+            <p style="color: var(--text-muted);">Create your account to access lessons, tests, and class chats.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" id="register-form">
+            {% csrf_token %}
+
+            <!-- Role Selection -->
+            <div
+                style="background: #f8fafc; padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 2.5rem;">
+                <label class="form-label"
+                    style="text-align: center; display: block; margin-bottom: 1.25rem; font-weight: 700;">I am joining
+                    as a:</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <label id="teacher-label" class="role-selector"
+                        style="display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; padding: 1.25rem; border: 2px solid var(--border); border-radius: var(--radius); transition: all 0.3s; background: white; text-align: center;">
+                        <span style="font-size: 2rem; margin-bottom: 0.5rem;">👨‍🏫</span>
+                        <span style="font-weight: 600;">Teacher</span>
+                        <input type="checkbox" name="is_teacher" id="id_is_teacher" style="display: none;">
+                    </label>
+                    <label id="student-label" class="role-selector"
+                        style="display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; padding: 1.25rem; border: 2px solid var(--border); border-radius: var(--radius); transition: all 0.3s; background: white; text-align: center;">
+                        <span style="font-size: 2rem; margin-bottom: 0.5rem;">🎓</span>
+                        <span style="font-weight: 600;">Student</span>
+                        <input type="checkbox" name="is_student" id="id_is_student" style="display: none;">
+                    </label>
+                </div>
+                <small id="role-error"
+                    style="color: var(--danger); display: none; text-align: center; margin-top: 0.75rem; font-weight: 600;">Please
+                    select either Teacher or Student.</small>
+            </div>
+
+            <div class="registration-section">
+                <h3 class="section-title">Account Details</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Nickname (Display Name)</label>
+                    <div style="position: relative;">
+                        <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg></span>
+                        <input type="text" name="nickname" id="id_nickname" class="form-input with-icon"
+                            placeholder="How others will see you" value="{{ form.nickname.value|default:'' }}">
+                    </div>
+                    {% if form.nickname.errors %}
+                    <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                        {{ form.nickname.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <div style="position: relative;">
+                        <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg></span>
+                        <input type="text" name="username" id="id_username" class="form-input with-icon"
+                            placeholder="Choose a username" required value="{{ form.username.value|default:'' }}">
+                    </div>
+                    {% if form.username.errors %}
+                    <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                        {{ form.username.errors.0 }}
+                    </div>
+                    {% endif %}
+                    {% if form.username.help_text %}<small class="text-muted"
+                        style="display: block; margin-top: 0.5rem;">{{ form.username.help_text }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <div style="position: relative;">
+                        <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                </path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg></span>
+                        <input type="email" name="email" id="id_email" class="form-input with-icon"
+                            placeholder="email@example.com" required value="{{ form.email.value|default:'' }}">
+                    </div>
+                    {% if form.email.errors %}
+                    <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                        {{ form.email.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="registration-section">
+                <h3 class="section-title">Personal Profile</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Full Real Name</label>
+                    <div style="position: relative;">
+                        <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                                </path>
+                            </svg></span>
+                        <input type="text" name="real_name" id="id_real_name" class="form-input with-icon"
+                            placeholder="As per official documents" required
+                            value="{{ form.real_name.value|default:'' }}">
+                    </div>
+                    {% if form.real_name.errors %}
+                    <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                        {{ form.real_name.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Bio (optional)</label>
+                    {{ form.bio }}
+                    {% if form.bio.errors %}
+                    <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                        {{ form.bio.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Profile Picture (optional)</label>
+                    {{ form.profile_pic }}
+                    {% if form.profile_pic.errors %}
+                    <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                        {{ form.profile_pic.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Student Only Fields -->
+            <div id="student-fields" style="display: none;" class="registration-section">
+                <h3 class="section-title" style="border-bottom-color: var(--primary); color: var(--primary);">Academic
+                    Info</h3>
+                <div class="grid grid-cols-2" style="gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Year Level</label>
+                        {{ form.year }}
+                        {% if form.year.errors %}
+                        <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                            {{ form.year.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stream</label>
+                        {{ form.stream }}
+                        {% if form.stream.errors %}
+                        <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                            {{ form.stream.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="registration-section">
+                <h3 class="section-title">Security</h3>
+                <div class="grid grid-cols-1 md-grid-cols-2"
+                    style="gap: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div style="position: relative;">
+                            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg></span>
+                            <input type="password" name="password1" id="id_password1" class="form-input with-icon"
+                                placeholder="Min. 8 characters" required>
+                        </div>
+                        {% if form.password1.errors %}
+                        <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                            {{ form.password1.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <div style="position: relative;">
+                            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg></span>
+                            <input type="password" name="password2" id="id_password2" class="form-input with-icon"
+                                placeholder="Repeat password" required>
+                        </div>
+                        {% if form.password2.errors %}
+                        <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
+                            {{ form.password2.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if form.errors %}
+            <div
+                style="background-color: #fef2f2; border: 1px solid #fee2e2; padding: 1.25rem; border-radius: var(--radius); margin-bottom: 2rem;">
+                <p style="color: var(--danger); font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">Validation
+                    Errors:</p>
+                <ul style="margin: 0; padding-left: 1.5rem;">
+                    {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                    <li style="color: var(--danger); font-size: 0.9rem; margin-bottom: 0.25rem;">{{ field|title }}: {{
+                        error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary"
+                style="width: 100%; padding: 1.25rem; font-size: 1.25rem; margin-top: 1rem; font-weight: 700; border-radius: var(--radius);">
+                Register Account
+            </button>
+        </form>
+
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center;">
+            <p style="font-size: 1rem; color: var(--text-muted);">
+                Already registered? <a href="{% url 'login' %}" style="font-weight: 700; color: var(--primary);">Log In
+                    Here</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .section-title {
+        font-size: 1.25rem;
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.75rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .registration-section {
+        margin-bottom: 3rem;
+    }
+
+    .field-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        pointer-events: none;
+    }
+
+    .form-input.with-icon {
+        padding-left: 3rem;
+    }
+
+    .role-selector:hover {
+        border-color: var(--primary) !important;
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .role-active {
+        border-color: var(--primary) !important;
+        background: var(--background) !important;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    }
+</style>
+
+<script>
+    // Apply form-input class only once
+    document.querySelectorAll('input:not([type="checkbox"]), textarea, select').forEach(input => {
+        if (!input.classList.contains('form-input')) {
+            input.classList.add('form-input');
+        }
+    });
+
+    const studentCheck = document.getElementById('id_is_student');
+    const teacherCheck = document.getElementById('id_is_teacher');
+    const studentLabel = document.getElementById('student-label');
+    const teacherLabel = document.getElementById('teacher-label');
+    const studentFields = document.getElementById('student-fields');
+
+    function updateRoles() {
+        if (studentCheck.checked) {
+            studentLabel.classList.add('role-active');
+            teacherCheck.checked = false;
+            teacherLabel.classList.remove('role-active');
+            studentFields.style.display = 'block';
+            document.getElementById('id_year').required = true;
+            document.getElementById('id_stream').required = true;
+        } else if (teacherCheck.checked) {
+            teacherLabel.classList.add('role-active');
+            studentCheck.checked = false;
+            studentLabel.classList.remove('role-active');
+            studentFields.style.display = 'none';
+            document.getElementById('id_year').required = false;
+            document.getElementById('id_stream').required = false;
+        } else {
+            studentLabel.classList.remove('role-active');
+            teacherLabel.classList.remove('role-active');
+            studentFields.style.display = 'none';
+        }
+    }
+
+    // Mutual exclusion: if one is checked, uncheck the other
+    studentCheck.addEventListener('change', () => {
+        if (studentCheck.checked) {
+            teacherCheck.checked = false;
+        }
+        updateRoles();
+    });
+
+    teacherCheck.addEventListener('change', () => {
+        if (teacherCheck.checked) {
+            studentCheck.checked = false;
+        }
+        updateRoles();
+    });
+
+    document.getElementById('register-form').addEventListener('submit', function (e) {
+        if (!studentCheck.checked && !teacherCheck.checked) {
+            e.preventDefault();
+            document.getElementById('role-error').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
+    // Sync username with nickname
+    const nicknameInput = document.getElementById('id_nickname');
+    const usernameInput = document.getElementById('id_username');
+
+    nicknameInput.addEventListener('input', function () {
+        // Sanitize for username: lowercase, replace spaces with underscores, remove non-allowed chars
+        const val = this.value.toLowerCase()
+            .replace(/\s+/g, '_')
+            .replace(/[^\w.@+-]/g, '');
+        usernameInput.value = val;
+    });
+
+    // Initial run
+    updateRoles();
+</script>
+{% endblock %}

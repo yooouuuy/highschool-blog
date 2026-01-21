@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div class="card">
+        <h1 class="mb-4">{{ test.title }}</h1>
+        <p class="mb-4" style="color: var(--text-muted);">{{ test.description }}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for question in questions %}
+            <div class="mb-4"
+                style="background-color: var(--background); padding: 1.5rem; border-radius: var(--radius);">
+                <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">{{ forloop.counter }}. {{ question.text }}</h3>
+                <div class="grid" style="grid-template-columns: 1fr; gap: 0.75rem;">
+                    <label
+                        style="display: flex; align-items: center; cursor: pointer; padding: 0.5rem; border-radius: var(--radius); border: 1px solid var(--border); background: white;">
+                        <input type="radio" name="question_{{ question.id }}" value="A" style="margin-right: 0.75rem;">
+                        <span>{{ question.option_a }}</span>
+                    </label>
+                    <label
+                        style="display: flex; align-items: center; cursor: pointer; padding: 0.5rem; border-radius: var(--radius); border: 1px solid var(--border); background: white;">
+                        <input type="radio" name="question_{{ question.id }}" value="B" style="margin-right: 0.75rem;">
+                        <span>{{ question.option_b }}</span>
+                    </label>
+                    <label
+                        style="display: flex; align-items: center; cursor: pointer; padding: 0.5rem; border-radius: var(--radius); border: 1px solid var(--border); background: white;">
+                        <input type="radio" name="question_{{ question.id }}" value="C" style="margin-right: 0.75rem;">
+                        <span>{{ question.option_c }}</span>
+                    </label>
+                    <label
+                        style="display: flex; align-items: center; cursor: pointer; padding: 0.5rem; border-radius: var(--radius); border: 1px solid var(--border); background: white;">
+                        <input type="radio" name="question_{{ question.id }}" value="D" style="margin-right: 0.75rem;">
+                        <span>{{ question.option_d }}</span>
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.1rem;">Submit
+                    Test</button>
+            </div>
+        </form>
+    </div>
+    <div class="mt-4">
+        <a href="{% url 'test_list' %}" class="btn btn-secondary">&larr; Cancel</a>
+    </div>
+</div>
+{% endblock %}
