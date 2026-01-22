@@ -17,7 +17,7 @@
             <select name="year" id="year" class="form-input" style="width: 100%;">
                 <option value="">All Years</option>
                 {% for val, label in year_choices %}
-                <option value="{{ val }}" {% if filters.year==val|stringformat:"i" %}selected{% endif %}>{{ label }}
+                <option value="{{ val }}" {% if filters.year == val|stringformat:"i" %}selected{% endif %}>{{ label }}
                 </option>
                 {% endfor %}
             </select>
@@ -28,7 +28,7 @@
             <select name="stream" id="stream" class="form-input" style="width: 100%;">
                 <option value="">All Streams</option>
                 {% for val, label in stream_choices %}
-                <option value="{{ val }}" {% if filters.stream==val %}selected{% endif %}>{{ label }}</option>
+                <option value="{{ val }}" {% if filters.stream == val %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -38,7 +38,7 @@
             <select name="subject" id="subject" class="form-input" style="width: 100%;">
                 <option value="">All Subjects</option>
                 {% for val, label in subject_choices %}
-                <option value="{{ val }}" {% if filters.subject==val %}selected{% endif %}>{{ label }}</option>
+                <option value="{{ val }}" {% if filters.subject == val %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
         </div>

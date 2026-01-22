@@ -15,6 +15,7 @@ urlpatterns = [
     path('dashboard/teacher/', views.teacher_dashboard, name='teacher_dashboard'),
     path('lessons/pending/', views.pending_lessons, name='pending_lessons'),
     path('lessons/approve/<int:pk>/', views.approve_lesson, name='approve_lesson'),
+    path('tests/approve/<int:pk>/', views.approve_test, name='approve_test'),
     path('announcements/create/', views.announcement_create, name='announcement_create'),
     path('announcements/delete/<int:pk>/', views.delete_announcement, name='delete_announcement'),
     path('chat/<int:year>/<str:stream>/', views.chat_room, name='chat_room'),

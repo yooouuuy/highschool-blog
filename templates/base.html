@@ -54,7 +54,7 @@
                     {% if user.profile_pic %}
                     <img src="{{ user.profile_pic.url }}" alt="Profile" class="nav-avatar">
                     {% endif %}
-                    <span>{{ user.nickname|default:user.real_name }}</span>
+                    <span>{{ user.nickname|default:user.real_name|default:user.username }}</span>
                 </a>
 
                 <a href="{% url 'logout' %}" class="btn btn-secondary logout-btn">Logout</a>

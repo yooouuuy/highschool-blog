@@ -70,8 +70,15 @@ def test_create(request):
         if form.is_valid():
             test = form.save(commit=False)
             test.author = request.user
-            test.save()
-            return redirect('test_detail', pk=test.pk)
+            # Auto-approve for teachers/staff, otherwise pending
+            if request.user.is_teacher or request.user.is_staff:
+                test.is_approved = True
+                test.save()
+                return redirect('test_detail', pk=test.pk)
+            else:
+                test.is_approved = False
+                test.save()
+                return redirect('test_list')
     else:
         form = TestForm()
     
@@ -134,7 +141,7 @@ def result_detail(request, pk):
     return render(request, 'content/result_detail.html', {'result': result})
 
 def test_list(request):
-    tests = Test.objects.all().order_by('-created_at')
+    tests = Test.objects.filter(is_approved=True).order_by('-created_at')
     
     year = request.GET.get('year')
     stream = request.GET.get('stream')
@@ -173,7 +180,8 @@ def teacher_dashboard(request):
 @user_passes_test(is_teacher)
 def pending_lessons(request):
     lessons = Lesson.objects.filter(is_approved=False).order_by('-created_at')
-    return render(request, 'content/pending_lessons.html', {'lessons': lessons})
+    tests = Test.objects.filter(is_approved=False).order_by('-created_at')
+    return render(request, 'content/pending_lessons.html', {'lessons': lessons, 'tests': tests})
 
 @login_required
 @user_passes_test(is_teacher)
@@ -181,6 +189,14 @@ def approve_lesson(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
     lesson.is_approved = True
     lesson.save()
+    return redirect('pending_lessons')
+
+@login_required
+@user_passes_test(is_teacher)
+def approve_test(request, pk):
+    test = get_object_or_404(Test, pk=pk)
+    test.is_approved = True
+    test.save()
     return redirect('pending_lessons')
 
 @login_required
@@ -215,13 +231,13 @@ def chat_room(request, year, stream):
     messages = ChatMessage.objects.filter(year=year, stream=stream).order_by('-created_at')[:50]
     messages = reversed(messages)  # Show oldest first
     
-    stream_display = dict(ChatMessage.STREAM_CHOICES).get(stream, stream)
+    stream_display = dict(STREAM_CHOICES).get(stream, stream)
     
     return render(request, 'content/chat.html', {
         'year': year,
         'stream': stream,
         'messages': messages,
-        'year_display': dict(ChatMessage.YEAR_CHOICES)[year],
+        'year_display': dict(YEAR_CHOICES).get(year, year),
         'stream_display': stream_display
     })
 

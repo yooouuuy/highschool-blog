@@ -1,19 +1,52 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ test.title }}</h1>
-<p>{{ test.description }}</p>
+<div class="card">
+    <div class="flex" style="gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+        {% if test.year %}
+        <span class="badge badge-year">Year {{ test.year }}</span>
+        {% endif %}
+        {% if test.stream %}
+        <span class="badge badge-stream">{{ test.get_stream_display }}</span>
+        {% endif %}
+        {% if test.subject %}
+        <span class="badge badge-subject">{{ test.get_subject_display }}</span>
+        {% endif %}
+    </div>
+    <h1>{{ test.title }}</h1>
+    <p
+        style="color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+        {{ test.description }}</p>
 
-<h3>Questions</h3>
-<ul>
-    {% for question in test.questions.all %}
-    <li>{{ question.text }}</li>
-    {% empty %}
-    <li>No questions yet.</li>
-    {% endfor %}
-</ul>
+    <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <small style="color: var(--text-muted);">Created by {{
+            test.author.nickname|default:test.author.real_name|default:test.author.username }}</small>
+        {% if user.is_teacher %}
+        <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary">Take Test (Preview)</a>
+        {% else %}
+        <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary">Take Test</a>
+        {% endif %}
+    </div>
 
-{% if user == test.author %}
-<a href="{% url 'question_add' test_pk=test.pk %}">Add Question</a>
-{% endif %}
+    <h3>Questions</h3>
+    <ul style="list-style: none; padding: 0;">
+        {% for question in test.questions.all %}
+        <li class="card" style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc;">
+            <strong>Q{{ forloop.counter }}:</strong> {{ question.text }}
+        </li>
+        {% empty %}
+        <li style="color: var(--text-muted);">No questions yet.</li>
+        {% endfor %}
+    </ul>
+
+    {% if user == test.author %}
+    <div style="margin-top: 2rem; text-align: right;">
+        <a href="{% url 'question_add' test_pk=test.pk %}" class="btn btn-secondary">Add Question</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'test_list' %}" class="btn btn-secondary">&larr; Back to Tests</a>
+</div>
 {% endblock %}

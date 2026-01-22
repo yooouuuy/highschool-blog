@@ -1,41 +1,83 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="mb-4">Pending Lessons</h1>
+<h1 class="mb-4">Pending Content</h1>
 
-<div class="card">
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-                    <th style="padding: 1rem;">Title</th>
-                    <th style="padding: 1rem;">Author</th>
-                    <th style="padding: 1rem;">Created At</th>
-                    <th style="padding: 1rem;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for lesson in lessons %}
-                <tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 1rem; font-weight: 500;">
-                        <a href="{% url 'lesson_detail' pk=lesson.pk %}">{{ lesson.title }}</a>
-                    </td>
-                    <td style="padding: 1rem;">{{ lesson.author.nickname|default:lesson.author.username }}</td>
-                    <td style="padding: 1rem; color: var(--text-muted);">{{ lesson.created_at|date:"M j, Y" }}</td>
-                    <td style="padding: 1rem;">
-                        <a href="{% url 'approve_lesson' pk=lesson.pk %}" class="btn btn-primary"
-                            style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Approve</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
-                        No pending lessons.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<section class="mb-5">
+    <h2 class="mb-3">Pending Lessons</h2>
+    <div class="card">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                        <th style="padding: 1rem;">Title</th>
+                        <th style="padding: 1rem;">Author</th>
+                        <th style="padding: 1rem;">Created At</th>
+                        <th style="padding: 1rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lesson in lessons %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem; font-weight: 500;">
+                            <a href="{% url 'lesson_detail' pk=lesson.pk %}">{{ lesson.title }}</a>
+                        </td>
+                        <td style="padding: 1rem;">{{ lesson.author.nickname|default:lesson.author.username }}</td>
+                        <td style="padding: 1rem; color: var(--text-muted);">{{ lesson.created_at|date:"M j, Y" }}</td>
+                        <td style="padding: 1rem;">
+                            <a href="{% url 'approve_lesson' pk=lesson.pk %}" class="btn btn-primary"
+                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Approve</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                            No pending lessons.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+</section>
+
+<section>
+    <h2 class="mb-3">Pending Tests</h2>
+    <div class="card">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                        <th style="padding: 1rem;">Title</th>
+                        <th style="padding: 1rem;">Author</th>
+                        <th style="padding: 1rem;">Created At</th>
+                        <th style="padding: 1rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test in tests %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem; font-weight: 500;">
+                            <a href="{% url 'test_detail' pk=test.pk %}">{{ test.title }}</a>
+                        </td>
+                        <td style="padding: 1rem;">{{ test.author.nickname|default:test.author.username }}</td>
+                        <td style="padding: 1rem; color: var(--text-muted);">{{ test.created_at|date:"M j, Y" }}</td>
+                        <td style="padding: 1rem;">
+                            <a href="{% url 'approve_test' pk=test.pk %}" class="btn btn-primary"
+                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Approve</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                            No pending tests.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
 {% endblock %}
