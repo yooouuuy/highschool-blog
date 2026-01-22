@@ -8,13 +8,113 @@
     {% endif %}
 </div>
 
+<!-- Filters -->
+<section class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
+    <form method="GET" action="{% url 'test_list' %}" id="filter-form" class="flex"
+        style="gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 150px;">
+            <label for="year" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Year</label>
+            <select name="year" id="year" class="form-input" style="width: 100%;">
+                <option value="">All Years</option>
+                {% for val, label in year_choices %}
+                <option value="{{ val }}" {% if filters.year==val|stringformat:"i" %}selected{% endif %}>{{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label for="stream" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Stream</label>
+            <select name="stream" id="stream" class="form-input" style="width: 100%;">
+                <option value="">All Streams</option>
+                {% for val, label in stream_choices %}
+                <option value="{{ val }}" {% if filters.stream==val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label for="subject" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Subject</label>
+            <select name="subject" id="subject" class="form-input" style="width: 100%;">
+                <option value="">All Subjects</option>
+                {% for val, label in subject_choices %}
+                <option value="{{ val }}" {% if filters.subject==val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'test_list' %}" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</section>
+
+{{ subject_choices|json_script:"subject-choices-data" }}
+
+<script>
+    const streamToSubjects = {
+        'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'common_literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'math': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'languages': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'german', 'spanish'],
+        'literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'management_economics': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'accounting', 'law', 'economy'],
+        'civil_engineering': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'civil_eng']
+    };
+
+    const subjectChoices = JSON.parse(document.getElementById('subject-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const streamSelect = document.getElementById('stream');
+    const subjectSelect = document.getElementById('subject');
+
+    function updateSubjects() {
+        const stream = streamSelect.value;
+        const currentSubject = subjectSelect.value;
+
+        const validSubjects = stream ? streamToSubjects[stream] : Object.keys(subjectChoices);
+
+        subjectSelect.innerHTML = '<option value="">All Subjects</option>';
+
+        validSubjects.forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub;
+            option.textContent = subjectChoices[sub];
+            if (sub === currentSubject) option.selected = true;
+            subjectSelect.appendChild(option);
+        });
+    }
+
+    streamSelect.addEventListener('change', updateSubjects);
+
+    if (streamSelect.value) {
+        updateSubjects();
+    }
+</script>
+
 <div class="grid grid-cols-2">
     {% for test in tests %}
     <article class="card">
+        <div class="flex" style="gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+            {% if test.year %}
+            <span class="badge badge-year">Year {{ test.year }}</span>
+            {% endif %}
+            {% if test.stream %}
+            <span class="badge badge-stream">{{ test.get_stream_display }}</span>
+            {% endif %}
+            {% if test.subject %}
+            <span class="badge badge-subject">{{ test.get_subject_display }}</span>
+            {% endif %}
+        </div>
         <h3>{{ test.title }}</h3>
         <p style="color: var(--text-muted);">{{ test.description|truncatewords:20 }}</p>
         <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
-            <small style="color: var(--text-muted);">By {{ test.author.username }}</small>
+            <small style="color: var(--text-muted);">By {{
+                test.author.nickname|default:test.author.real_name|default:test.author.username }}</small>
             <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary"
                 style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Take Test</a>
         </div>

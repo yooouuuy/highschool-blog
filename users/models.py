@@ -20,6 +20,24 @@ STREAM_CHOICES = [
     ('civil_engineering', 'Civil Engineering Stream'),
 ]
 
+SUBJECT_CHOICES = [
+    # Common subjects
+    ('math', 'Math'),
+    ('science', 'Science'),
+    ('physics', 'Physics'),
+    ('arabic', 'Arabic'),
+    ('english', 'English'),
+    ('french', 'French'),
+    ('hist_geo', 'History & Geography'),
+    # Stream specific
+    ('civil_eng', 'Civil Engineering'),
+    ('accounting', 'Accounting'),
+    ('law', 'Law'),
+    ('economy', 'Economy'),
+    ('german', 'German'),
+    ('spanish', 'Spanish'),
+]
+
 class CustomUser(AbstractUser):
     is_teacher = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)

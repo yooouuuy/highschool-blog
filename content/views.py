@@ -2,15 +2,37 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Lesson, Test, Question, Result, Announcement, ChatMessage
 from .forms import LessonForm, TestForm, QuestionForm, AnnouncementForm
+from users.models import YEAR_CHOICES, STREAM_CHOICES, SUBJECT_CHOICES
 
 def is_teacher(user):
     return user.is_authenticated and (user.is_teacher or user.is_staff)
 
 def lesson_list(request):
     lessons = Lesson.objects.filter(is_approved=True).order_by('-created_at')
-    # Fetch latest 2 announcements
+    
+    year = request.GET.get('year')
+    stream = request.GET.get('stream')
+    subject = request.GET.get('subject')
+    
+    if year:
+        lessons = lessons.filter(year=year)
+    if stream:
+        lessons = lessons.filter(stream=stream)
+    if subject:
+        lessons = lessons.filter(subject=subject)
+        
     announcements = Announcement.objects.all().order_by('-created_at')[:2]
-    return render(request, 'content/lesson_list.html', {'lessons': lessons, 'announcements': announcements})
+    
+    from users.models import YEAR_CHOICES, STREAM_CHOICES, SUBJECT_CHOICES
+    
+    return render(request, 'content/lesson_list.html', {
+        'lessons': lessons, 
+        'announcements': announcements,
+        'year_choices': YEAR_CHOICES,
+        'stream_choices': STREAM_CHOICES,
+        'subject_choices': SUBJECT_CHOICES,
+        'filters': {'year': year, 'stream': stream, 'subject': subject}
+    })
 
 @login_required
 def lesson_detail(request, pk):
@@ -33,7 +55,13 @@ def lesson_create(request):
             return redirect('lesson_list')
     else:
         form = LessonForm()
-    return render(request, 'content/lesson_form.html', {'form': form})
+    
+    from users.models import SUBJECT_CHOICES, STREAM_CHOICES
+    return render(request, 'content/lesson_form.html', {
+        'form': form,
+        'subject_choices': SUBJECT_CHOICES,
+        'stream_choices': STREAM_CHOICES
+    })
 
 @login_required
 def test_create(request):
@@ -46,7 +74,13 @@ def test_create(request):
             return redirect('test_detail', pk=test.pk)
     else:
         form = TestForm()
-    return render(request, 'content/test_form.html', {'form': form})
+    
+    from users.models import SUBJECT_CHOICES, STREAM_CHOICES
+    return render(request, 'content/test_form.html', {
+        'form': form,
+        'subject_choices': SUBJECT_CHOICES,
+        'stream_choices': STREAM_CHOICES
+    })
 
 @login_required
 def test_detail(request, pk):
@@ -101,7 +135,27 @@ def result_detail(request, pk):
 
 def test_list(request):
     tests = Test.objects.all().order_by('-created_at')
-    return render(request, 'content/test_list.html', {'tests': tests})
+    
+    year = request.GET.get('year')
+    stream = request.GET.get('stream')
+    subject = request.GET.get('subject')
+    
+    if year:
+        tests = tests.filter(year=year)
+    if stream:
+        tests = tests.filter(stream=stream)
+    if subject:
+        tests = tests.filter(subject=subject)
+        
+    from users.models import YEAR_CHOICES, STREAM_CHOICES, SUBJECT_CHOICES
+    
+    return render(request, 'content/test_list.html', {
+        'tests': tests,
+        'year_choices': YEAR_CHOICES,
+        'stream_choices': STREAM_CHOICES,
+        'subject_choices': SUBJECT_CHOICES,
+        'filters': {'year': year, 'stream': stream, 'subject': subject}
+    })
 
 @login_required
 def student_dashboard(request):
