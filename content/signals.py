@@ -39,13 +39,13 @@ def notify_resource_approval(sender, instance, created, **kwargs):
 def notify_announcement(sender, instance, created, **kwargs):
     if created:
         User = get_user_model()
-        # Notify all active students (Caution: Performance heavy if many users)
-        # For this scale, we'll limit to active students
-        students = User.objects.filter(is_student=True, is_active=True)
+        # Notify all active users (students AND teachers)
+        recipients = User.objects.filter(is_active=True)
         notifications = []
-        for student in students:
+        for user in recipients:
             notifications.append(Notification(
-                recipient=student,
+                recipient=user,
+                announcement=instance,
                 title="New Announcement",
                 message=f"New announcement: {instance.title}",
                 link="/"

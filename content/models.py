@@ -158,6 +158,7 @@ class StudentAnswer(models.Model):
 
 class Notification(models.Model):
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    announcement = models.ForeignKey('Announcement', on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
     title = models.CharField(max_length=255)
     message = models.TextField()
     link = models.CharField(max_length=255, blank=True, null=True)
