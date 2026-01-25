@@ -411,6 +411,10 @@ select:focus {
     color: var(--danger);
 }
 
+.notification-unread {
+    background-color: rgba(99, 102, 241, 0.05) !important;
+}
+
 /* Animation */
 @keyframes fadeIn {
     from {

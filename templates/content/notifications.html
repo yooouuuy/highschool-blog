@@ -15,8 +15,9 @@
         {% if notifications %}
         <div class="list-group">
             {% for notification in notifications %}
-            <div class="notification-item p-4 border-bottom {% if not notification.is_read %}bg-light-blue{% endif %}"
-                style="display: flex; justify-content: space-between; align-items: start; {% if not notification.is_read %}background: rgba(99, 102, 241, 0.05);{% endif %} transition: background 0.2s;">
+            <div class="notification-item p-4 border-bottom {% if not notification.is_read %}notification-unread{% endif %}"
+                style="display: flex; justify-content: space-between; align-items: start; transition: background 0.2s;">
+
                 <div style="flex: 1; margin-right: 1rem;">
                     <h5 class="mb-1" style="font-size: 1rem; font-weight: 600;">{{ notification.title }}</h5>
                     <p class="mb-1 text-muted">{{ notification.message }}</p>
