@@ -223,7 +223,8 @@
                 <ul style="margin: 0; padding-left: 1.5rem;">
                     {% for field, errors in form.errors.items %}
                     {% for error in errors %}
-                    <li style="color: var(--danger); font-size: 0.9rem; margin-bottom: 0.25rem;">{{ field|title }}: {{ error }}</li>
+                    <li style="color: var(--danger); font-size: 0.9rem; margin-bottom: 0.25rem;">{{ field|title }}: {{
+                        error }}</li>
                     {% endfor %}
                     {% endfor %}
                 </ul>
@@ -295,11 +296,48 @@
         }
     });
 
+    const streamChoices = {
+        'common_science': 'Common Science',
+        'common_literature': 'Common Literature',
+        'math': 'Math Stream',
+        'science': 'Science Stream',
+        'languages': 'Languages Stream',
+        'literature': 'Literature Stream',
+        'management_economics': 'Management & Economics Stream',
+        'civil_engineering': 'Civil Engineering Stream'
+    };
+
     const studentCheck = document.getElementById('id_is_student');
     const teacherCheck = document.getElementById('id_is_teacher');
     const studentLabel = document.getElementById('student-label');
     const teacherLabel = document.getElementById('teacher-label');
     const studentFields = document.getElementById('student-fields');
+    const yearSelect = document.getElementById('id_year');
+    const streamSelect = document.getElementById('id_stream');
+
+    function updateStreams() {
+        const year = yearSelect.value;
+        const currentStream = streamSelect.value;
+
+        streamSelect.innerHTML = '<option value="">---------</option>';
+
+        let validStreams = [];
+        if (year == '1') {
+            validStreams = ['common_science', 'common_literature'];
+        } else if (year == '2' || year == '3') {
+            validStreams = ['math', 'science', 'languages', 'literature', 'management_economics', 'civil_engineering'];
+        } else {
+            validStreams = Object.keys(streamChoices);
+        }
+
+        validStreams.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = streamChoices[s];
+            if (s === currentStream) option.selected = true;
+            streamSelect.appendChild(option);
+        });
+    }
 
     function updateRoles() {
         if (studentCheck.checked) {
@@ -307,15 +345,16 @@
             teacherCheck.checked = false;
             teacherLabel.classList.remove('role-active');
             studentFields.style.display = 'block';
-            document.getElementById('id_year').required = true;
-            document.getElementById('id_stream').required = true;
+            if (yearSelect) yearSelect.required = true;
+            if (streamSelect) streamSelect.required = true;
+            updateStreams();
         } else if (teacherCheck.checked) {
             teacherLabel.classList.add('role-active');
             studentCheck.checked = false;
             studentLabel.classList.remove('role-active');
             studentFields.style.display = 'none';
-            document.getElementById('id_year').required = false;
-            document.getElementById('id_stream').required = false;
+            if (yearSelect) yearSelect.required = false;
+            if (streamSelect) streamSelect.required = false;
         } else {
             studentLabel.classList.remove('role-active');
             teacherLabel.classList.remove('role-active');
@@ -338,6 +377,10 @@
         updateRoles();
     });
 
+    if (yearSelect) {
+        yearSelect.addEventListener('change', updateStreams);
+    }
+
     document.getElementById('register-form').addEventListener('submit', function (e) {
         if (!studentCheck.checked && !teacherCheck.checked) {
             e.preventDefault();
@@ -350,13 +393,15 @@
     const nicknameInput = document.getElementById('id_nickname');
     const usernameInput = document.getElementById('id_username');
 
-    nicknameInput.addEventListener('input', function () {
-        // Sanitize for username: lowercase, replace spaces with underscores, remove non-allowed chars
-        const val = this.value.toLowerCase()
-            .replace(/\s+/g, '_')
-            .replace(/[^\w.@+-]/g, '');
-        usernameInput.value = val;
-    });
+    if (nicknameInput && usernameInput) {
+        nicknameInput.addEventListener('input', function () {
+            // Sanitize for username: lowercase, replace spaces with underscores, remove non-allowed chars
+            const val = this.value.toLowerCase()
+                .replace(/\s+/g, '_')
+                .replace(/[^\w.@+-]/g, '');
+            usernameInput.value = val;
+        });
+    }
 
     // Initial run
     updateRoles();

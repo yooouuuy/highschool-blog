@@ -36,6 +36,7 @@ SUBJECT_CHOICES = [
     ('economy', 'Economy'),
     ('german', 'German'),
     ('spanish', 'Spanish'),
+    ('philosophy', 'Philosophy'),
 ]
 
 class CustomUser(AbstractUser):

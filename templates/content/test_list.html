@@ -63,13 +63,24 @@
 {{ subject_choices|json_script:"subject-choices-data" }}
 
 <script>
+    const streamChoices = {
+        'common_science': 'Common Science',
+        'common_literature': 'Common Literature',
+        'math': 'Math Stream',
+        'science': 'Science Stream',
+        'languages': 'Languages Stream',
+        'literature': 'Literature Stream',
+        'management_economics': 'Management & Economics Stream',
+        'civil_engineering': 'Civil Engineering Stream'
+    };
+
     const streamToSubjects = {
         'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
         'common_literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
         'math': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
         'science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
-        'languages': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'german', 'spanish'],
-        'literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'languages': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'german', 'spanish', 'philosophy'],
+        'literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'philosophy'],
         'management_economics': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'accounting', 'law', 'economy'],
         'civil_engineering': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'civil_eng']
     };
@@ -79,13 +90,55 @@
         return acc;
     }, {});
 
+    const yearSelect = document.getElementById('year');
     const streamSelect = document.getElementById('stream');
     const subjectSelect = document.getElementById('subject');
 
+    function updateStreams() {
+        const year = yearSelect.value;
+        const currentStream = streamSelect.value;
+
+        streamSelect.innerHTML = '<option value="">All Streams</option>';
+
+        let validStreams = [];
+        if (year == '1') {
+            validStreams = ['common_science', 'common_literature'];
+        } else if (year == '2' || year == '3') {
+            validStreams = ['math', 'science', 'languages', 'literature', 'management_economics', 'civil_engineering'];
+        } else {
+            validStreams = Object.keys(streamChoices);
+        }
+
+        validStreams.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = streamChoices[s];
+            if (s === currentStream) option.selected = true;
+            streamSelect.appendChild(option);
+        });
+
+        updateSubjects();
+    }
+
     function updateSubjects() {
+        const year = yearSelect.value;
         const stream = streamSelect.value;
         const currentSubject = subjectSelect.value;
-        const validSubjects = stream ? streamToSubjects[stream] : Object.keys(subjectChoices);
+
+        let validSubjects = stream ? [...streamToSubjects[stream]] : Object.keys(subjectChoices);
+
+        if (year == '2') {
+            if (stream && stream !== 'languages' && stream !== 'literature') {
+                validSubjects = validSubjects.filter(s => s !== 'philosophy');
+            }
+        } else if (year == '1') {
+            validSubjects = validSubjects.filter(s => s !== 'philosophy');
+        } else if (year == '3') {
+            if (stream && !validSubjects.includes('philosophy')) {
+                validSubjects.push('philosophy');
+            }
+        }
+
         subjectSelect.innerHTML = '<option value="">All Subjects</option>';
         validSubjects.forEach(sub => {
             const option = document.createElement('option');
@@ -96,8 +149,10 @@
         });
     }
 
+    yearSelect.addEventListener('change', updateStreams);
     streamSelect.addEventListener('change', updateSubjects);
-    if (streamSelect.value) updateSubjects();
+    if (yearSelect.value) updateStreams();
+    else if (streamSelect.value) updateSubjects();
 </script>
 
 <div class="grid grid-cols-2">
