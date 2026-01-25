@@ -223,8 +223,7 @@
                 <ul style="margin: 0; padding-left: 1.5rem;">
                     {% for field, errors in form.errors.items %}
                     {% for error in errors %}
-                    <li style="color: var(--danger); font-size: 0.9rem; margin-bottom: 0.25rem;">{{ field|title }}: {{
-                        error }}</li>
+                    <li style="color: var(--danger); font-size: 0.9rem; margin-bottom: 0.25rem;">{{ field|title }}: {{ error }}</li>
                     {% endfor %}
                     {% endfor %}
                 </ul>

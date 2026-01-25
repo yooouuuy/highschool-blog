@@ -10,8 +10,81 @@
 <div class="grid home-grid" style="grid-template-columns: 2fr 1fr;">
     <!-- Left Column: News and Lessons -->
     <div>
-        {% if announcements %}
-        <section class="mb-4">
+        <section class="mb-5">
+            <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Recent Lessons</h2>
+                <a href="{% url 'lesson_list' %}" class="btn btn-secondary btn-sm">View All</a>
+            </div>
+
+            <div class="grid grid-cols-1">
+                {% for lesson in lessons %}
+                <article class="card">
+                    <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
+                        {% if lesson.year %}
+                        <span class="badge badge-year">Year {{ lesson.year }}</span>
+                        {% endif %}
+                        {% if lesson.subject %}
+                        <span class="badge badge-subject">{{ lesson.get_subject_display }}</span>
+                        {% endif %}
+                    </div>
+                    {% with l_title=lesson.title %}
+                    <h3>{{ l_title }}</h3>
+                    {% endwith %}
+                    <p class="text-muted">{{ lesson.content|truncatewords:30 }}</p>
+                    <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+                        {% with l_author=lesson.author %}
+                        <small class="text-muted">Author: {{
+                            l_author.nickname|default:l_author.real_name|default:l_author.username }}</small>
+                        {% endwith %}
+                        <a href="{% url 'lesson_detail' pk=lesson.pk %}" class="btn btn-primary btn-sm">Read more</a>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="card text-center" style="padding: 2rem; background: var(--background);">
+                    <p class="text-muted">No lessons available.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section>
+            <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Recent Tests</h2>
+                <a href="{% url 'test_list' %}" class="btn btn-secondary btn-sm">View All</a>
+            </div>
+
+            <div class="grid grid-cols-1">
+                {% for test in tests %}
+                <article class="card">
+                    <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
+                        {% if test.year %}
+                        <span class="badge badge-year">Year {{ test.year }}</span>
+                        {% endif %}
+                        {% if test.subject %}
+                        <span class="badge badge-subject">{{ test.get_subject_display }}</span>
+                        {% endif %}
+                    </div>
+                    {% with t_title=test.title %}
+                    <h3>{{ t_title }}</h3>
+                    {% endwith %}
+                    <p class="text-muted">{{ test.description|truncatewords:30 }}</p>
+                    <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+                        {% with t_author=test.author %}
+                        <small class="text-muted">Author: {{
+                            t_author.nickname|default:t_author.real_name|default:t_author.username }}</small>
+                        {% endwith %}
+                        <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary btn-sm">Take Test</a>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="card text-center" style="padding: 2rem; background: var(--background);">
+                    <p class="text-muted">No tests are available at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="mt-5 mb-4">
             <h2 class="mb-4">School Announcements</h2>
             <div class="grid grid-cols-1">
                 {% for announcement in announcements %}
@@ -30,64 +103,10 @@
                         {% endif %}
                     </div>
                 </div>
-                {% endfor %}
-            </div>
-        </section>
-        {% endif %}
-
-        <section class="mb-5">
-            <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2>Recent Lessons</h2>
-                <a href="{% url 'lesson_list' %}" class="btn btn-secondary btn-sm">View All</a>
-            </div>
-            
-            <div class="grid grid-cols-1">
-                {% for lesson in lessons %}
-                <article class="card">
-                    <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
-                        {% if lesson.year %}<span class="badge badge-year">Year {{ lesson.year }}</span>{% endif %}
-                        {% if lesson.subject %}<span class="badge badge-subject">{{ lesson.get_subject_display }}</span>{% endif %}
-                    </div>
-                    <h3>{{ lesson.title }}</h3>
-                    <p class="text-muted">{{ lesson.content|truncatewords:30 }}</p>
-                    <div class="flex"
-                        style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
-                        <small class="text-muted">By {{
-                            lesson.author.nickname|default:lesson.author.real_name|default:lesson.author.username }}</small>
-                        <a href="{% url 'lesson_detail' pk=lesson.pk %}" class="btn btn-primary btn-sm">Read
-                            more</a>
-                    </div>
-                </article>
                 {% empty %}
-                <p>No lessons available.</p>
-                {% endfor %}
-            </div>
-        </section>
-
-        <section>
-            <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2>Recent Tests</h2>
-                <a href="{% url 'test_list' %}" class="btn btn-secondary btn-sm">View All</a>
-            </div>
-
-            <div class="grid grid-cols-1">
-                {% for test in tests %}
-                <article class="card">
-                    <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
-                        {% if test.year %}<span class="badge badge-year">Year {{ test.year }}</span>{% endif %}
-                        {% if test.subject %}<span class="badge badge-subject">{{ test.get_subject_display }}</span>{% endif %}
-                    </div>
-                    <h3>{{ test.title }}</h3>
-                    <p class="text-muted">{{ test.description|truncatewords:30 }}</p>
-                    <div class="flex"
-                        style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
-                        <small class="text-muted">By {{
-                            test.author.nickname|default:test.author.real_name|default:test.author.username }}</small>
-                        <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary btn-sm">Take Test</a>
-                    </div>
-                </article>
-                {% empty %}
-                <p>No tests available.</p>
+                <div class="card text-center" style="padding: 2rem; background: var(--background);">
+                    <p class="text-muted">No announcements are available at the moment.</p>
+                </div>
                 {% endfor %}
             </div>
         </section>
@@ -95,11 +114,18 @@
 
     <!-- Right Column: Chat Section -->
     <aside>
-        {% if user.is_authenticated and year and stream %}
+        {% if user.is_authenticated %}
+        {% if year and stream %}
         <div class="chat-container home-chat">
-            <div class="chat-header">
-                <h3>Class Chat</h3>
-                <p>{{ year_display }} - {{ stream_display }}</p>
+            <div class="chat-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3>Class Chat</h3>
+                    <p>{{ year_display }} - {{ stream_display }}</p>
+                </div>
+                <button id="clear-chat-btn" class="btn btn-sm btn-outline-danger"
+                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Clear my chat history">
+                    Clear
+                </button>
             </div>
 
             <div id="chat-messages" class="chat-messages">
@@ -128,12 +154,31 @@
         </div>
 
         <script>
-            // Chat logic for Home Page
             (function () {
                 const chatMessages = document.getElementById('chat-messages');
                 const chatForm = document.getElementById('chat-form');
                 const messageInput = document.getElementById('message-input');
+                const clearChatBtn = document.getElementById('clear-chat-btn');
                 let lastMessageId = null;
+
+                if (clearChatBtn) {
+                    clearChatBtn.addEventListener('click', async () => {
+                        if (!confirm('Are you sure you want to clear your chat history? This cannot be undone.')) return;
+                        try {
+                            const response = await fetch('{% url "clear_chat_history" %}', {
+                                method: 'POST',
+                                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                            });
+                            const data = await response.json();
+                            if (data.success) {
+                                chatMessages.innerHTML = '<p class="text-center" style="color: var(--text-muted); margin-top: 1rem;">Chat history cleared.</p>';
+                                lastMessageId = null;
+                            }
+                        } catch (error) {
+                            console.error('Error clearing chat:', error);
+                        }
+                    });
+                }
 
                 function getCsrfToken() {
                     return document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -143,69 +188,164 @@
                     const div = document.createElement('div');
                     div.className = `message-bubble ${msg.is_mine ? 'mine' : 'others'}`;
                     div.setAttribute('data-id', msg.id);
-                    div.style.maxWidth = '85%';
 
-                    div.innerHTML = `
+                    let actionsHtml = '';
+                    if (msg.is_mine) {
+                        actionsHtml = `
+                            <div class="message-actions">
+                                <span class="action-btn edit" onclick="handleEdit(${msg.id})">Edit</span>
+                                <span class="action-btn delete" onclick="handleDelete(${msg.id})">Delete</span>
+                            </div>
+                        `;
+                    } else if ({% if user.is_staff or user.is_teacher %} true{% else %} false{% endif %}) {
+                    actionsHtml = `
+                            <div class="message-actions">
+                                <span class="action-btn delete" onclick="handleDelete(${msg.id})">Delete</span>
+                            </div>
+                        `;
+                }
+
+                div.innerHTML = `
+                        ${actionsHtml}
                         <div class="message-info" style="font-size: 0.7rem;">
                             <strong>${msg.author}</strong>
                             <span>${msg.time}</span>
                         </div>
                         <div class="message-text" style="font-size: 0.85rem;">${msg.text}</div>
                     `;
-                    return div;
-                }
+                return div;
+            }
 
-                async function fetchMessages() {
-                    try {
-                        const url = `{% url 'get_messages' year=year stream=stream %}?last_id=${lastMessageId || ''}`;
-                        const response = await fetch(url);
-                        const data = await response.json();
+            async function handleEdit(id) {
+                const bubble = document.querySelector(`.message-bubble[data-id="${id}"]`);
+                const textDiv = bubble.querySelector('.message-text');
+                const originalText = textDiv.innerText;
 
-                        if (data.success && data.messages.length > 0) {
-                            if (lastMessageId === null) chatMessages.innerHTML = '';
+                // Store original text in data attribute instead of passing through onclick
+                textDiv.setAttribute('data-original', originalText);
 
-                            data.messages.forEach(msg => {
-                                chatMessages.appendChild(createMessageElement(msg));
-                                lastMessageId = msg.id;
-                            });
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
-                        } else if (lastMessageId === null && data.messages.length === 0) {
-                            chatMessages.innerHTML = '<p class="text-center" style="color: var(--text-muted); margin-top: 1rem;">No messages yet.</p>';
-                        }
-                    } catch (error) {
-                        console.error('Home chat error:', error);
+                // Hide actions during edit
+                bubble.querySelector('.message-actions').style.display = 'none';
+
+                textDiv.innerHTML = `
+                        <div class="edit-input-area">
+                            <textarea class="edit-input" style="height: 60px;">${originalText}</textarea>
+                            <div class="edit-controls">
+                                <button class="btn btn-sm btn-secondary" style="padding: 2px 5px; font-size: 0.7rem;" onclick="cancelEdit(${id})">Cancel</button>
+                                <button class="btn btn-sm btn-primary" style="padding: 2px 5px; font-size: 0.7rem;" onclick="saveEdit(${id})">Save</button>
+                            </div>
+                        </div>
+                    `;
+            }
+
+            window.cancelEdit = (id) => {
+                const bubble = document.querySelector(`.message-bubble[data-id="${id}"]`);
+                const textDiv = bubble.querySelector('.message-text');
+                textDiv.innerText = textDiv.getAttribute('data-original');
+                bubble.querySelector('.message-actions').style.display = '';
+            }
+
+            window.saveEdit = async (id) => {
+                const bubble = document.querySelector(`.message-bubble[data-id="${id}"]`);
+                const newText = bubble.querySelector('.edit-input').value.trim();
+                if (!newText) return;
+
+                const formData = new FormData();
+                formData.append('message', newText);
+                formData.append('csrfmiddlewaretoken', getCsrfToken());
+
+                try {
+                    const response = await fetch(`/content/chat/message/edit/${id}/`, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() },
+                        body: formData
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        bubble.querySelector('.message-text').innerText = data.text;
+                        bubble.querySelector('.message-actions').style.display = '';
+                    } else {
+                        alert('Edit failed: ' + (data.error || 'Unknown error'));
+                    }
+                } catch (error) { console.error(error); }
+            }
+
+            window.handleDelete = async (id) => {
+                if (!confirm('Delete this message?')) return;
+
+                try {
+                    const response = await fetch(`/content/chat/message/delete/${id}/`, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() }
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        document.querySelector(`.message-bubble[data-id="${id}"]`).remove();
+                    } else {
+                        alert('Delete failed: ' + (data.error || 'Unknown error'));
+                    }
+                } catch (error) { console.error(error); }
+            }
+
+            window.handleEdit = handleEdit;
+
+            async function fetchMessages() {
+                try {
+                    const url = `{% url 'get_messages' year=year stream=stream %}?last_id=${lastMessageId || ''}`;
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        if (response.status === 403) throw new Error('Access denied. Check your year/stream settings.');
+                        throw new Error('Failed to load chat.');
+                    }
+                    const data = await response.json();
+                    if (data.success && data.messages.length > 0) {
+                        if (lastMessageId === null) chatMessages.innerHTML = '';
+                        data.messages.forEach(msg => {
+                            chatMessages.appendChild(createMessageElement(msg));
+                            lastMessageId = msg.id;
+                        });
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    } else if (lastMessageId === null && data.messages.length === 0) {
+                        chatMessages.innerHTML = '<p class="text-center text-muted" style="margin-top:2rem;">No messages yet.</p>';
+                    }
+                } catch (error) {
+                    console.error(error);
+                    if (lastMessageId === null) {
+                        chatMessages.innerHTML = `<p class="text-center text-danger" style="margin-top:2rem;">${error.message}</p>`;
                     }
                 }
+            }
 
-                chatForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const message = messageInput.value.trim();
-                    if (!message) return;
-
-                    const formData = new FormData();
-                    formData.append('message', message);
-                    formData.append('csrfmiddlewaretoken', getCsrfToken());
-                    messageInput.value = '';
-
-                    try {
-                        const response = await fetch('{% url "send_message" year=year stream=stream %}', {
-                            method: 'POST',
-                            headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() },
-                            body: formData
-                        });
-                        const data = await response.json();
-                        if (data.success && !document.querySelector(`[data-id="${data.message.id}"]`)) {
-                            chatMessages.appendChild(createMessageElement(data.message));
-                            lastMessageId = data.message.id;
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const message = messageInput.value.trim();
+                if (!message) return;
+                const formData = new FormData();
+                formData.append('message', message);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                messageInput.value = '';
+                try {
+                    const response = await fetch('{% url "send_message" year=year stream=stream %}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
-                    } catch (error) { console.error('Send error:', error); }
-                });
-
-                fetchMessages();
-                setInterval(fetchMessages, 3000);
-            })();
+                    });
+                    if (!response.ok) throw new Error('Failed to send');
+                    const data = await response.json();
+                    if (data.success) {
+                        fetchMessages(); // Refresh immediately
+                    }
+                } catch (error) {
+                    alert('Error sending message. Please try again.');
+                }
+            });
+            fetchMessages();
+            setInterval(fetchMessages, 3000);
+            }) ();
         </script>
+        {% endif %}
         {% else %}
         <div class="card text-center" style="padding: 2rem; background: #f1f5f9;">
             <p style="color: var(--text-muted);">Please <a href="{% url 'login' %}">login</a> as a student to

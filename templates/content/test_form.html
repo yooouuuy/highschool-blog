@@ -2,34 +2,74 @@
 
 {% block content %}
 <h1>Create Test</h1>
-<form method="post" class="card" style="padding: 2rem; max-width: 800px; margin: 0 auto;">
+<form method="post" enctype="multipart/form-data" class="card" style="padding: 2rem; max-width: 800px; margin: 0 auto;">
     {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-error"
+        style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
+        {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
     <div style="margin-bottom: 1.5rem;">
         <label for="id_title" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Title</label>
         {{ form.title }}
+        {% if form.title.errors %}
+        <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
+            form.title.errors }}</div>
+        {% endif %}
     </div>
+
     <div style="margin-bottom: 1.5rem;">
         <label for="id_description" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Description</label>
         {{ form.description }}
+        {% if form.description.errors %}
+        <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
+            form.description.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 1.5rem;">
+        <label for="id_pdf_file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">PDF File
+            (Optional)</label>
+        {{ form.pdf_file }}
+        {% if form.pdf_file.errors %}
+        <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
+            form.pdf_file.errors }}</div>
+        {% endif %}
     </div>
 
     <div class="grid grid-cols-3" style="gap: 1.5rem; margin-bottom: 1.5rem;">
         <div>
             <label for="id_year" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Year</label>
             {{ form.year }}
+            {% if form.year.errors %}
+            <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
+                form.year.errors }}</div>
+            {% endif %}
         </div>
         <div>
             <label for="id_stream" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Stream</label>
             {{ form.stream }}
+            {% if form.stream.errors %}
+            <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
+                form.stream.errors }}</div>
+            {% endif %}
         </div>
         <div>
             <label for="id_subject" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Subject</label>
             {{ form.subject }}
+            {% if form.subject.errors %}
+            <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
+                form.subject.errors }}</div>
+            {% endif %}
         </div>
     </div>
 
     <div style="text-align: right;">
-        <button type="submit" class="btn btn-primary">Create Test</button>
+        <button type="submit" class="btn btn-primary">
+            {% if user.is_teacher or user.is_staff %}Create Test{% else %}Submit for Approval{% endif %}
+        </button>
         <a href="{% url 'test_list' %}" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
@@ -84,10 +124,10 @@
     input[type="text"] {
         width: 100%;
         padding: 0.75rem;
-        border: 1px solid var(--border-color);
-        border-radius: 0.5rem;
-        background-color: var(--card-bg);
-        color: var(--text-color);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background-color: var(--surface);
+        color: var(--text);
     }
 
     textarea {

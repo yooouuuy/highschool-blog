@@ -9,7 +9,10 @@
                     <h2>{{ year_display }}</h2>
                     <p class="subtitle">{{ stream_display }}</p>
                 </div>
-                <div class="chat-badge-area">
+                <div class="chat-badge-area" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <button id="clear-chat-btn" class="btn btn-outline-danger btn-sm" title="Clear my chat history">
+                        Clear Chat
+                    </button>
                     <span class="badge badge-white">Chat Room</span>
                 </div>
             </div>
@@ -50,20 +53,141 @@
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
 
+    const clearChatBtn = document.getElementById('clear-chat-btn');
+    if (clearChatBtn) {
+        clearChatBtn.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to clear your chat history? This cannot be undone.')) return;
+
+            try {
+                const response = await fetch('{% url "clear_chat_history" %}', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCsrfToken() }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    chatMessages.innerHTML = ''; // Specific for chat page: just empty it
+                    // Show a message saying it's cleared
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'text-center loading-state';
+                    emptyState.innerHTML = '<p class="text-muted">Chat history cleared.</p>';
+                    chatMessages.appendChild(emptyState);
+                    lastMessageId = null;
+                }
+            } catch (error) {
+                console.error('Error clearing chat:', error);
+                alert('Failed to clear chat history.');
+            }
+        });
+    }
+
     function createMessageElement(msg) {
         const div = document.createElement('div');
         div.className = `message-bubble ${msg.is_mine ? 'mine' : 'others'}`;
         div.setAttribute('data-id', msg.id);
 
-        div.innerHTML = `
+        let actionsHtml = '';
+        if (msg.is_mine) {
+            actionsHtml = `
+                <div class="message-actions">
+                    <span class="action-btn edit" onclick="handleEdit(${msg.id})">Edit</span>
+                    <span class="action-btn delete" onclick="handleDelete(${msg.id})">Delete</span>
+                </div>
+            `;
+        } else if ({% if user.is_staff or user.is_teacher %} true{% else %} false{% endif %}) {
+        actionsHtml = `
+                <div class="message-actions">
+                    <span class="action-btn delete" onclick="handleDelete(${msg.id})">Delete</span>
+                </div>
+            `;
+    }
+
+    div.innerHTML = `
+            ${actionsHtml}
             <div class="message-info">
                 <strong>${msg.author}</strong>
                 <span>${msg.time}</span>
             </div>
             <div class="message-text">${msg.text}</div>
         `;
-        return div;
+    return div;
     }
+
+    async function handleEdit(id) {
+        const bubble = document.querySelector(`.message-bubble[data-id="${id}"]`);
+        const textDiv = bubble.querySelector('.message-text');
+        const originalText = textDiv.innerText;
+
+        // Store original text in data attribute instead of passing through onclick
+        textDiv.setAttribute('data-original', originalText);
+
+        // Hide actions during edit
+        bubble.querySelector('.message-actions').style.display = 'none';
+
+        textDiv.innerHTML = `
+            <div class="edit-input-area">
+                <textarea class="edit-input">${originalText}</textarea>
+                <div class="edit-controls">
+                    <button class="btn btn-sm btn-secondary" onclick="cancelEdit(${id})">Cancel</button>
+                    <button class="btn btn-sm btn-primary" onclick="saveEdit(${id})">Save</button>
+                </div>
+            </div>
+        `;
+    }
+
+    window.cancelEdit = (id) => {
+        const bubble = document.querySelector(`.message-bubble[data-id="${id}"]`);
+        const textDiv = bubble.querySelector('.message-text');
+        textDiv.innerText = textDiv.getAttribute('data-original');
+        bubble.querySelector('.message-actions').style.display = '';
+    }
+
+    window.saveEdit = async (id) => {
+        const bubble = document.querySelector(`.message-bubble[data-id="${id}"]`);
+        const newText = bubble.querySelector('.edit-input').value.trim();
+        if (!newText) return;
+
+        const formData = new FormData();
+        formData.append('message', newText);
+        formData.append('csrfmiddlewaretoken', getCsrfToken());
+
+        try {
+            const response = await fetch(`/content/chat/message/edit/${id}/`, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() },
+                body: formData
+            });
+            const data = await response.json();
+            if (data.success) {
+                bubble.querySelector('.message-text').innerText = data.text;
+                bubble.querySelector('.message-actions').style.display = '';
+            } else {
+                alert('Edit failed: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error editing:', error);
+        }
+    }
+
+    window.handleDelete = async (id) => {
+        if (!confirm('Are you sure you want to delete this message?')) return;
+
+        try {
+            const response = await fetch(`/content/chat/message/delete/${id}/`, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() }
+            });
+            const data = await response.json();
+            if (data.success) {
+                document.querySelector(`.message-bubble[data-id="${id}"]`).remove();
+            } else {
+                alert('Delete failed: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error deleting:', error);
+        }
+    }
+
+    window.handleEdit = handleEdit;
 
     async function fetchMessages() {
         try {

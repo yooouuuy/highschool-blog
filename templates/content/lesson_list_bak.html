@@ -3,19 +3,19 @@
 {% block content %}
 <div class="flex" style="justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
     <div>
-        <h1>Tests</h1>
+        <h1>Lessons</h1>
         {% if total_count %}
-        <p class="text-muted">{{ total_count }} Test{{ total_count|pluralize }} available</p>
+        <p class="text-muted">{{ total_count }} Lesson{{ total_count|pluralize }} available</p>
         {% endif %}
     </div>
     {% if user.is_authenticated %}
-    <a href="{% url 'test_create' %}" class="btn btn-primary">Create New Test</a>
+    <a href="{% url 'lesson_create' %}" class="btn btn-primary">Create New Lesson</a>
     {% endif %}
 </div>
 
 <!-- Filters -->
 <section class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
-    <form method="GET" action="{% url 'test_list' %}" id="filter-form" class="flex"
+    <form method="GET" action="{% url 'lesson_list' %}" id="filter-form" class="flex"
         style="gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;">
         <div style="flex: 1; min-width: 150px;">
             <label for="year" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Year</label>
@@ -23,7 +23,7 @@
                 <option value="">All Years</option>
                 {% with current_year=filters.year|add:0 %}
                 {% for val, label in year_choices %}
-                <option value="{{ val }}" {% if current_year == val %}selected{% endif %}>{{ label }}</option>
+                <option value="{{ val }}" {% if current_year==val %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
                 {% endwith %}
             </select>
@@ -35,7 +35,7 @@
                 <option value="">All Streams</option>
                 {% with current_stream=filters.stream %}
                 {% for val, label in stream_choices %}
-                <option value="{{ val }}" {% if current_stream == val %}selected{% endif %}>{{ label }}</option>
+                <option value="{{ val }}" {% if current_stream==val %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
                 {% endwith %}
             </select>
@@ -47,7 +47,7 @@
                 <option value="">All Subjects</option>
                 {% with current_subject=filters.subject %}
                 {% for val, label in subject_choices %}
-                <option value="{{ val }}" {% if current_subject == val %}selected{% endif %}>{{ label }}</option>
+                <option value="{{ val }}" {% if current_subject==val %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
                 {% endwith %}
             </select>
@@ -55,7 +55,7 @@
 
         <div class="flex" style="gap: 0.5rem;">
             <button type="submit" class="btn btn-primary">Filter</button>
-            <a href="{% url 'test_list' %}" class="btn btn-secondary">Clear</a>
+            <a href="{% url 'lesson_list' %}" class="btn btn-secondary">Clear</a>
         </div>
     </form>
 </section>
@@ -101,31 +101,33 @@
 </script>
 
 <div class="grid grid-cols-2">
-    {% for test in tests %}
+    {% for lesson in lessons %}
     <article class="card">
         <div class="flex" style="gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-            {% if test.year %}
-            <span class="badge badge-year">Year {{ test.year }}</span>
+            {% if lesson.year %}
+            <span class="badge badge-year">Year {{ lesson.year }}</span>
             {% endif %}
-            {% if test.stream %}
-            <span class="badge badge-stream">{{ test.get_stream_display }}</span>
+            {% if lesson.stream %}
+            <span class="badge badge-stream">{{ lesson.get_stream_display }}</span>
             {% endif %}
-            {% if test.subject %}
-            <span class="badge badge-subject">{{ test.get_subject_display }}</span>
+            {% if lesson.subject %}
+            <span class="badge badge-subject">{{ lesson.get_subject_display }}</span>
             {% endif %}
         </div>
-        <h3>{{ test.title }}</h3>
-        <p style="color: var(--text-muted);">{{ test.description|truncatewords:20 }}</p>
-        <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
-            {% with t_author=test.author %}
+        <h3>{{ lesson.title }}</h3>
+        <div style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+            {{ lesson.content|striptags|truncatewords:20 }}
+        </div>
+        <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1rem;">
+            {% with l_author=lesson.author %}
             <small style="color: var(--text-muted);">Author: <a
-                    href="{% url 'teacher_profile' username=t_author.username %}"
+                    href="{% url 'teacher_profile' username=l_author.username %}"
                     style="color: inherit; text-decoration: underline;">{{
-                    t_author.nickname|default:t_author.real_name|default:t_author.username }}</a></small>
+                    l_author.nickname|default:l_author.real_name|default:l_author.username }}</a></small>
             {% endwith %}
             <div class="flex" style="gap: 0.5rem;">
-                {% if test.pdf_file %}
-                <a href="{{ test.pdf_file.url }}" class="btn btn-secondary btn-sm" download title="Download PDF">
+                {% if lesson.pdf_file %}
+                <a href="{{ lesson.pdf_file.url }}" class="btn btn-secondary btn-sm" download title="Download PDF">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
@@ -135,9 +137,9 @@
                 </a>
                 {% endif %}
                 {% if user.is_staff or user.is_teacher %}
-                <a href="{% url 'test_delete' pk=test.pk %}" class="btn btn-secondary btn-sm" title="Delete Test"
+                <a href="{% url 'lesson_delete' pk=lesson.pk %}" class="btn btn-secondary btn-sm" title="Delete Lesson"
                     style="color: var(--danger); border-color: var(--danger);"
-                    onclick="return confirm('Delete this test?');">
+                    onclick="return confirm('Delete this lesson?');">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="3 6 5 6 21 6"></polyline>
@@ -145,14 +147,14 @@
                     </svg>
                 </a>
                 {% endif %}
-                <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary btn-sm">Take Test</a>
+                <a href="{% url 'lesson_detail' pk=lesson.pk %}" class="btn btn-primary btn-sm">Read More</a>
             </div>
         </div>
     </article>
     {% empty %}
     <div class="card text-center" style="grid-column: 1 / -1; padding: 4rem; background: var(--surface);">
-        <h3 class="text-muted">No tests found matching your criteria.</h3>
-        <a href="{% url 'test_list' %}" class="btn btn-secondary mt-4">Clear All Filters</a>
+        <h3 class="text-muted">No lessons found matching your criteria.</h3>
+        <a href="{% url 'lesson_list' %}" class="btn btn-secondary mt-4">Clear All Filters</a>
     </div>
     {% endfor %}
 </div>

@@ -48,6 +48,9 @@ class CustomUser(AbstractUser):
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     year = models.IntegerField(choices=YEAR_CHOICES, null=True, blank=True, help_text='Year level (for students)')
     stream = models.CharField(max_length=50, choices=STREAM_CHOICES, blank=True, help_text='Academic stream (for students)')
+    
+    # Field to track when the user last cleared their chat history
+    last_chat_clear_time = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.pk and not self.is_superuser:

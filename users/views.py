@@ -1,4 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import get_user_model
+from content.models import Lesson, Test, Resource
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
@@ -46,3 +48,18 @@ def profile_edit(request):
     else:
         form = UserUpdateForm(instance=request.user)
     return render(request, 'users/profile_edit.html', {'form': form})
+
+def teacher_profile(request, username):
+    User = get_user_model()
+    profile_user = get_object_or_404(User, username=username)
+    
+    lessons = Lesson.objects.filter(author=profile_user, is_approved=True).order_by('-created_at')
+    tests = Test.objects.filter(author=profile_user, is_approved=True).order_by('-created_at')
+    resources = Resource.objects.filter(author=profile_user, is_approved=True).order_by('-created_at')
+    
+    return render(request, 'users/teacher_profile.html', {
+        'profile_user': profile_user,
+        'lessons': lessons,
+        'tests': tests,
+        'resources': resources
+    })

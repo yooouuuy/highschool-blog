@@ -27,8 +27,7 @@
                         placeholder="Your username" required autofocus>
                 </div>
                 {% if form.username.errors %}
-                <small style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; display: block;">{{
-                    form.username.errors.0 }}</small>
+                <small style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; display: block;">{{ form.username.errors.0 }}</small>
                 {% endif %}
             </div>
 
@@ -47,8 +46,7 @@
                         style="padding-left: 3rem;" placeholder="Your password" required>
                 </div>
                 {% if form.password.errors %}
-                <small style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; display: block;">{{
-                    form.password.errors.0 }}</small>
+                <small style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; display: block;">{{ form.password.errors.0 }}</small>
                 {% endif %}
             </div>
 

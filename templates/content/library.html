@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex" style="justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+    <div>
+        <h1 class="mb-1">Resource Library</h1>
+        <p class="text-muted">{{ total_count }} Resource{{ total_count|pluralize }} available for download</p>
+    </div>
+    {% if user.is_authenticated %}
+    <a href="{% url 'resource_create' %}" class="btn btn-primary">Upload Resource</a>
+    {% endif %}
+</div>
+
+<!-- Filters -->
+<section class="card mb-5">
+    <form method="GET" action="{% url 'resource_list' %}" class="flex"
+        style="gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 150px;">
+            <label class="form-label">Year</label>
+            <select name="year" class="form-input">
+                <option value="">All Years</option>
+                {% with current_year=filters.year|add:0 %}
+                {% for val, label in year_choices %}
+                <option value="{{ val }}" {% if current_year == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label class="form-label">Stream</label>
+            <select name="stream" class="form-input">
+                <option value="">All Streams</option>
+                {% with current_stream=filters.stream %}
+                {% for val, label in stream_choices %}
+                <option value="{{ val }}" {% if current_stream == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label class="form-label">Subject</label>
+            <select name="subject" class="form-input">
+                <option value="">All Subjects</option>
+                {% with current_subject=filters.subject %}
+                {% for val, label in subject_choices %}
+                <option value="{{ val }}" {% if current_subject == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label class="form-label">Type</label>
+            <select name="type" class="form-input">
+                <option value="">All Types</option>
+                {% with current_type=filters.type %}
+                {% for val, label in type_choices %}
+                <option value="{{ val }}" {% if current_type == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div class="flex" style="gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'resource_list' %}" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</section>
+
+<div class="grid grid-cols-2">
+    {% for resource in resources %}
+    <article class="card">
+        <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
+            {% if resource.year %}
+            <span class="badge badge-year">Year {{ resource.year }}</span>
+            {% endif %}
+            {% if resource.subject %}
+            <span class="badge badge-subject">{{ resource.get_subject_display }}</span>
+            {% endif %}
+            <span class="badge" style="background: rgba(0,0,0,0.05);">{{ resource.get_type_display }}</span>
+        </div>
+
+        <h3 class="mb-3">{{ resource.title }}</h3>
+
+        <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1rem;">
+            {% with author=resource.author %}
+            <small class="text-muted">By: {{ author.nickname|default:author.real_name|default:author.username }}</small>
+            {% endwith %}
+
+            <div class="flex" style="gap: 0.5rem;">
+                {% if resource.type == 'pdf' and resource.file %}
+                <a href="{{ resource.file.url }}" class="btn btn-primary btn-sm" download>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 0.5rem;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download
+                </a>
+                {% elif resource.type == 'video' and resource.url %}
+                <a href="{{ resource.url }}" target="_blank" class="btn btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 0.5rem;">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Watch
+                </a>
+                {% elif resource.url %}
+                <a href="{{ resource.url }}" target="_blank" class="btn btn-secondary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 0.5rem;">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    Open Link
+                </a>
+                {% endif %}
+                {% if user.is_staff or user.is_teacher %}
+                <a href="{% url 'resource_delete' pk=resource.pk %}" class="btn btn-secondary btn-sm"
+                    style="color: var(--danger); border-color: var(--danger); padding: 0.25rem 0.5rem;"
+                    onclick="return confirm('Delete this resource?');">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <div class="card text-center" style="grid-column: 1 / -1; padding: 4rem;">
+        <p class="text-muted">No resources found matching your criteria.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

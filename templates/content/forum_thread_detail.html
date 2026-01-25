@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-narrow">
+    <nav class="mb-4">
+        <a href="{% url 'forum_subjects' %}" class="text-muted">Forums</a> /
+        <a href="{% url 'forum_thread_list' subject=thread.subject %}" class="text-muted">{{ thread.get_subject_display
+            }}</a> /
+        <span>{{ thread.title }}</span>
+    </nav>
+
+    <div class="flex" style="justify-content: space-between; align-items: flex-start;">
+        <div>
+            <div class="flex mb-2" style="gap: 0.5rem;">
+                {% if thread.year %}<span class="badge badge-year">Year {{ thread.year }}</span>{% endif %}
+                {% if thread.stream %}<span class="badge badge-stream">{{ thread.get_stream_display }}</span>{% endif %}
+                <span class="badge badge-secondary">{{ thread.get_category_display }}</span>
+            </div>
+            <h1 class="mb-5">{{ thread.title }}</h1>
+        </div>
+        {% if user.is_staff or user == thread.author %}
+        <a href="{% url 'forum_thread_delete' pk=thread.pk %}" class="btn btn-secondary btn-sm"
+            style="color: var(--danger); border-color: var(--danger);"
+            onclick="return confirm('Delete this entire discussion?');">Delete Thread</a>
+        {% endif %}
+    </div>
+
+    <div class="flex flex-column" style="gap: 1.5rem;">
+        {% for post in posts %}
+        <div class="card" style="padding: 1.5rem;">
+            <div class="flex mb-3"
+                style="justify-content: space-between; align-items: center; border-bottom: 1px solid var(--background); padding-bottom: 0.75rem;">
+                <div class="flex" style="align-items: center; gap: 0.75rem;">
+                    {% with author=post.author %}
+                    <span style="font-weight: 700;">{{ author.nickname|default:author.real_name|default:author.username
+                        }}</span>
+                    {% endwith %}
+                    {% if post.author.is_teacher %}
+                    <span class="badge badge-primary">Teacher</span>
+                    {% endif %}
+                </div>
+                <small class="text-muted">{{ post.created_at|date:"M j, Y - g:i A" }}</small>
+            </div>
+            <div style="line-height: 1.7; color: var(--text);">
+                {{ post.content|linebreaks }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Reply Form -->
+    <div class="card mt-5" style="border-top: 4px solid var(--primary);">
+        <h3 class="mb-4">Post a Reply</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.content }}
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Submit Reply</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
