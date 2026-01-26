@@ -149,49 +149,32 @@
         });
     }
 
-    yearSelect.addEventListener('change', updateStreams);
-    streamSelect.addEventListener('change', updateSubjects);
+    if (yearSelect) yearSelect.addEventListener('change', updateStreams);
+    if (streamSelect) streamSelect.addEventListener('change', updateSubjects);
+
     if (yearSelect.value) updateStreams();
     else if (streamSelect.value) updateSubjects();
 </script>
 
-<div class="grid grid-cols-2">
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
     {% for test in tests %}
     <article class="card">
-        <div class="flex" style="gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-            {% if test.year %}
-            <span class="badge badge-year">Year {{ test.year }}</span>
-            {% endif %}
-            {% if test.stream %}
-            <span class="badge badge-stream">{{ test.get_stream_display }}</span>
-            {% endif %}
-            {% if test.subject %}
-            <span class="badge badge-subject">{{ test.get_subject_display }}</span>
-            {% endif %}
+        <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
+            {% if test.year %}<span class="badge badge-year">Year {{ test.year }}</span>{% endif %}
+            {% if test.stream %}<span class="badge badge-stream">{{ test.get_stream_display }}</span>{% endif %}
+            {% if test.subject %}<span class="badge badge-subject">{{ test.get_subject_display }}</span>{% endif %}
         </div>
         <h3>{{ test.title }}</h3>
-        <p style="color: var(--text-muted);">{{ test.description|truncatewords:20 }}</p>
+        <p class="text-muted">{{ test.description|truncatewords:30 }}</p>
         <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
-            {% with t_author=test.author %}
-            <small style="color: var(--text-muted);">Author: <a
-                    href="{% url 'teacher_profile' username=t_author.username %}"
-                    style="color: inherit; text-decoration: underline;">{{
-                    t_author.nickname|default:t_author.real_name|default:t_author.username }}</a></small>
+            {% with author=test.author %}
+            <small class="text-muted">Author: {{ author.nickname|default:author.real_name|default:author.username }}</small>
             {% endwith %}
             <div class="flex" style="gap: 0.5rem;">
-                {% if test.pdf_file %}
-                <a href="{{ test.pdf_file.url }}" class="btn btn-secondary btn-sm" download title="Download PDF">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                </a>
-                {% endif %}
-                {% if user.is_staff or user.is_teacher %}
-                <a href="{% url 'test_delete' pk=test.pk %}" class="btn btn-secondary btn-sm" title="Delete Test"
-                    style="color: var(--danger); border-color: var(--danger);"
+                <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary btn-sm">Take Test</a>
+                {% if user.is_staff or user == test.author %}
+                <a href="{% url 'test_delete' pk=test.pk %}" class="btn btn-secondary btn-sm"
+                    style="color: var(--danger); border-color: var(--danger); padding: 0.25rem 0.5rem;"
                     onclick="return confirm('Delete this test?');">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -200,14 +183,12 @@
                     </svg>
                 </a>
                 {% endif %}
-                <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary btn-sm">Take Test</a>
             </div>
         </div>
     </article>
     {% empty %}
-    <div class="card text-center" style="grid-column: 1 / -1; padding: 4rem; background: var(--surface);">
-        <h3 class="text-muted">No tests found matching your criteria.</h3>
-        <a href="{% url 'test_list' %}" class="btn btn-secondary mt-4">Clear All Filters</a>
+    <div class="card text-center" style="padding: 4rem;">
+        <p class="text-muted">No tests available.</p>
     </div>
     {% endfor %}
 </div>

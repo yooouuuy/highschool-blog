@@ -383,8 +383,8 @@ def get_messages(request, year, stream):
     if last_id:
         messages_query = messages_query.filter(id__gt=last_id)
     else:
-        messages_query = messages_query.order_by('-created_at')[:50]
-        messages_query = sorted(messages_query, key=lambda x: x.created_at)
+        # Load all history since last clear time (remove the 50-message limit)
+        messages_query = messages_query.order_by('created_at')
 
     message_list = []
     for msg in messages_query:

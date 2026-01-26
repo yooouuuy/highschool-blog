@@ -12,7 +12,7 @@
 </div>
 
 <!-- Filters -->
-<section class="card mb-5">
+<section class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
     <form method="GET" action="{% url 'resource_list' %}" class="flex"
         style="gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;">
         <div style="flex: 1; min-width: 150px;">
@@ -57,7 +57,7 @@
                 <option value="">All Types</option>
                 {% with current_type=filters.type %}
                 {% for val, label in type_choices %}
-                <option value="{{ val }}" {% if current_type==val %}selected{% endif %}>{{ label }}</option>
+                <option value="{{ val }}" {% if current_type == val %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
                 {% endwith %}
             </select>
@@ -166,7 +166,7 @@
     else if (streamSelect.value) updateSubjects();
 </script>
 
-<div class="grid grid-cols-2">
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
     {% for resource in resources %}
     <article class="card">
         <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
