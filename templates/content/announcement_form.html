@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div style="max-width: 800px; margin: 0 auto;">
     <div class="card">
-        <h2 class="mb-4">Create Announcement</h2>
+        <h2 class="mb-4">{% trans "Create Announcement" %}</h2>
         <form method="post">
             {% csrf_token %}
             {% for field in form %}
@@ -16,8 +17,8 @@
             </div>
             {% endfor %}
             <div class="flex" style="justify-content: space-between; margin-top: 2rem;">
-                <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Post Announcement</button>
+                <a href="{% url 'home' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+                <button type="submit" class="btn btn-primary">{% trans "Post Announcement" %}</button>
             </div>
         </form>
     </div>

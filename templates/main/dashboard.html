@@ -1,32 +1,33 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
-<h1>Dashboard</h1>
+<h1>{% trans "Dashboard" %}</h1>
 
 {% if user.is_teacher %}
-<h2>Your Lessons</h2>
-<a href="#">Create New Lesson</a>
+<h2>{% trans "Your Lessons" %}</h2>
+<a href="#">{% trans "Create New Lesson" %}</a>
 <ul>
     {% for lesson in user_lessons %}
-    <li>{{ lesson.title }} - <a href="#">Edit</a></li>
+    <li>{{ lesson.title }} - <a href="#">{% trans "Edit" %}</a></li>
     {% empty %}
-    <li>No lessons created yet.</li>
+    <li>{% trans "No lessons created yet." %}</li>
     {% endfor %}
 </ul>
 
-<h2>Your Tests</h2>
-<a href="#">Create New Test</a>
+<h2>{% trans "Your Tests" %}</h2>
+<a href="#">{% trans "Create New Test" %}</a>
 <ul>
     {% for test in user_tests %}
-    <li>{{ test.title }} - <a href="#">Edit</a></li>
+    <li>{{ test.title }} - <a href="#">{% trans "Edit" %}</a></li>
     {% empty %}
-    <li>No tests created yet.</li>
+    <li>{% trans "No tests created yet." %}</li>
     {% endfor %}
 </ul>
 {% endif %}
 
 {% if user.is_student %}
-<h2>Available Tests</h2>
-<p>List of tests to take (TBD)</p>
+<h2>{% trans "Available Tests" %}</h2>
+<p>{% trans "List of tests to take (TBD)" %}</p>
 {% endif %}
 {% endblock %}

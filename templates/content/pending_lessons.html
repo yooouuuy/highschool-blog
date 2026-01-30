@@ -1,19 +1,20 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
-<h1 class="mb-4">Pending Content</h1>
+<h1 class="mb-4">{% trans "Pending Content" %}</h1>
 
 <section class="mb-5">
-    <h2 class="mb-3">Pending Lessons</h2>
+    <h2 class="mb-3">{% trans "Pending Lessons" %}</h2>
     <div class="card">
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-                        <th style="padding: 1rem;">Title</th>
-                        <th style="padding: 1rem;">Author</th>
-                        <th style="padding: 1rem;">Created At</th>
-                        <th style="padding: 1rem;">Actions</th>
+                        <th style="padding: 1rem;">{% trans "Title" %}</th>
+                        <th style="padding: 1rem;">{% trans "Author" %}</th>
+                        <th style="padding: 1rem;">{% trans "Created At" %}</th>
+                        <th style="padding: 1rem;">{% trans "Actions" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,8 +24,8 @@
                             <a href="{% url 'lesson_detail' pk=lesson.pk %}">{{ lesson.title }}</a>
                             <div style="margin-top: 0.25rem;">
                                 {% if lesson.year %}<span class="badge badge-year"
-                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">Year {{ lesson.year }}</span>{%
-                                endif %}
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{% trans "Year" %} {{ lesson.year
+                                    }}</span>{% endif %}
                                 {% if lesson.stream %}<span class="badge badge-stream"
                                     style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ lesson.get_stream_display
                                     }}</span>{% endif %}
@@ -34,18 +35,17 @@
                             </div>
                         </td>
                         <td style="padding: 1rem;">{% with author=lesson.author %}{{
-                            author.nickname|default:author.real_name|default:author.username }}{% endwith %}
-                        </td>
+                            author.nickname|default:author.real_name|default:author.username }}{% endwith %}</td>
                         <td style="padding: 1rem; color: var(--text-muted);">{{ lesson.created_at|date:"M j, Y" }}</td>
                         <td style="padding: 1rem;">
                             <a href="{% url 'approve_lesson' pk=lesson.pk %}" class="btn btn-primary"
-                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Approve</a>
+                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">{% trans "Approve" %}</a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
-                            No pending lessons.
+                            {% trans "No pending lessons." %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -56,16 +56,16 @@
 </section>
 
 <section class="mb-5">
-    <h2 class="mb-3">Pending Tests</h2>
+    <h2 class="mb-3">{% trans "Pending Tests" %}</h2>
     <div class="card">
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-                        <th style="padding: 1rem;">Title</th>
-                        <th style="padding: 1rem;">Author</th>
-                        <th style="padding: 1rem;">Created At</th>
-                        <th style="padding: 1rem;">Actions</th>
+                        <th style="padding: 1rem;">{% trans "Title" %}</th>
+                        <th style="padding: 1rem;">{% trans "Author" %}</th>
+                        <th style="padding: 1rem;">{% trans "Created At" %}</th>
+                        <th style="padding: 1rem;">{% trans "Actions" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -75,8 +75,8 @@
                             <a href="{% url 'test_detail' pk=test.pk %}">{{ test.title }}</a>
                             <div style="margin-top: 0.25rem;">
                                 {% if test.year %}<span class="badge badge-year"
-                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">Year {{ test.year }}</span>{%
-                                endif %}
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{% trans "Year" %} {{ test.year
+                                    }}</span>{% endif %}
                                 {% if test.stream %}<span class="badge badge-stream"
                                     style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ test.get_stream_display
                                     }}</span>{% endif %}
@@ -90,13 +90,13 @@
                         <td style="padding: 1rem; color: var(--text-muted);">{{ test.created_at|date:"M j, Y" }}</td>
                         <td style="padding: 1rem;">
                             <a href="{% url 'approve_test' pk=test.pk %}" class="btn btn-primary"
-                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Approve</a>
+                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">{% trans "Approve" %}</a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
-                            No pending tests.
+                            {% trans "No pending tests." %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -107,16 +107,16 @@
 </section>
 
 <section class="mt-5">
-    <h2 class="mb-3">Pending Resources</h2>
+    <h2 class="mb-3">{% trans "Pending Resources" %}</h2>
     <div class="card">
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-                        <th style="padding: 1rem;">Title</th>
-                        <th style="padding: 1rem;">Type</th>
-                        <th style="padding: 1rem;">Author</th>
-                        <th style="padding: 1rem;">Actions</th>
+                        <th style="padding: 1rem;">{% trans "Title" %}</th>
+                        <th style="padding: 1rem;">{% trans "Type" %}</th>
+                        <th style="padding: 1rem;">{% trans "Author" %}</th>
+                        <th style="padding: 1rem;">{% trans "Actions" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -130,8 +130,8 @@
                             {% endif %}
                             <div style="margin-top: 0.25rem;">
                                 {% if resource.year %}<span class="badge badge-year"
-                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">Year {{ resource.year }}</span>{%
-                                endif %}
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{% trans "Year" %} {{
+                                    resource.year }}</span>{% endif %}
                                 {% if resource.stream %}<span class="badge badge-stream"
                                     style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ resource.get_stream_display
                                     }}</span>{% endif %}
@@ -145,13 +145,13 @@
                             author.nickname|default:author.real_name|default:author.username }}{% endwith %}</td>
                         <td style="padding: 1rem;">
                             <a href="{% url 'approve_resource' pk=resource.pk %}" class="btn btn-primary"
-                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Approve</a>
+                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">{% trans "Approve" %}</a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
-                            No pending resources.
+                            {% trans "No pending resources." %}
                         </td>
                     </tr>
                     {% endfor %}

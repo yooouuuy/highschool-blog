@@ -1,42 +1,43 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 YEAR_CHOICES = [
-    (1, 'First Year'),
-    (2, 'Second Year'),
-    (3, 'Third Year'),
+    (1, _('First Year')),
+    (2, _('Second Year')),
+    (3, _('Third Year')),
 ]
 
 STREAM_CHOICES = [
     # First Year
-    ('common_science', 'Common Science'),
-    ('common_literature', 'Common Literature'),
+    ('common_science', _('Common Science')),
+    ('common_literature', _('Common Literature')),
     # Second & Third Year
-    ('math', 'Math Stream'),
-    ('science', 'Science Stream'),
-    ('languages', 'Languages Stream'),
-    ('literature', 'Literature Stream'),
-    ('management_economics', 'Management & Economics Stream'),
-    ('civil_engineering', 'Civil Engineering Stream'),
+    ('math', _('Math Stream')),
+    ('science', _('Science Stream')),
+    ('languages', _('Languages Stream')),
+    ('literature', _('Literature Stream')),
+    ('management_economics', _('Management & Economics Stream')),
+    ('civil_engineering', _('Civil Engineering Stream')),
 ]
 
 SUBJECT_CHOICES = [
     # Common subjects
-    ('math', 'Math'),
-    ('science', 'Science'),
-    ('physics', 'Physics'),
-    ('arabic', 'Arabic'),
-    ('english', 'English'),
-    ('french', 'French'),
-    ('hist_geo', 'History & Geography'),
+    ('math', _('Math')),
+    ('science', _('Science')),
+    ('physics', _('Physics')),
+    ('arabic', _('Arabic')),
+    ('english', _('English')),
+    ('french', _('French')),
+    ('hist_geo', _('History & Geography')),
     # Stream specific
-    ('civil_eng', 'Civil Engineering'),
-    ('accounting', 'Accounting'),
-    ('law', 'Law'),
-    ('economy', 'Economy'),
-    ('german', 'German'),
-    ('spanish', 'Spanish'),
-    ('philosophy', 'Philosophy'),
+    ('civil_eng', _('Civil Engineering')),
+    ('accounting', _('Accounting')),
+    ('law', _('Law')),
+    ('economy', _('Economy')),
+    ('german', _('German')),
+    ('spanish', _('Spanish')),
+    ('philosophy', _('Philosophy')),
 ]
 
 class CustomUser(AbstractUser):

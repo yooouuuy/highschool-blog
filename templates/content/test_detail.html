@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div style="max-width: 900px; margin: 0 auto;">
     <div class="card" style="padding: 2.5rem;">
         <div class="flex" style="gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-            {% if test.year %}<span class="badge badge-year">Year {{ test.year }}</span>{% endif %}
+            {% if test.year %}<span class="badge badge-year">{% trans "Year" %} {{ test.year }}</span>{% endif %}
             {% if test.stream %}<span class="badge badge-stream">{{ test.get_stream_display }}</span>{% endif %}
             {% if test.subject %}<span class="badge badge-subject">{{ test.get_subject_display }}</span>{% endif %}
         </div>
@@ -21,7 +22,7 @@
             <div style="display: flex; align-items: center; gap: 0.75rem;">
                 <span style="font-size: 1.5rem;">ðŸ“„</span>
                 <div>
-                    <h5 style="margin: 0; font-size: 1rem;">Attached PDF Document</h5>
+                    <h5 style="margin: 0; font-size: 1rem;">{% trans "Attached PDF Document" %}</h5>
                     <small class="text-muted">{{ test.pdf_file.name }}</small>
                 </div>
             </div>
@@ -33,7 +34,7 @@
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                Download PDF
+                {% trans "Download PDF" %}
             </a>
         </div>
         {% endif %}
@@ -41,22 +42,23 @@
         <div class="flex"
             style="justify-content: space-between; align-items: center; margin-bottom: 2.5rem; background: var(--background); padding: 1.5rem; border-radius: var(--radius);">
             <div style="display: flex; flex-direction: column;">
-                <span style="font-weight: 500;">Created by: <a
+                <span style="font-weight: 500;">{% trans "Created by:" %} <a
                         href="{% url 'teacher_profile' username=test.author.username %}"
                         style="color: inherit; text-decoration: underline;">{% with author=test.author %}{{
                         author.nickname|default:author.real_name|default:author.username }}{% endwith %}</a></span>
             </div>
             {% if user.is_teacher %}
-            <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Take
-                Test (Preview)</a>
+            <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">{% trans
+                "Take Test (Preview)" %}</a>
             {% else %}
-            <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Take
-                Test Now</a>
+            <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">{% trans
+                "Take Test Now" %}</a>
             {% endif %}
         </div>
 
         <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h3 style="margin: 0;">{{ test.questions.count }} Question{{ test.questions.count|pluralize }}</h3>
+            <h3 style="margin: 0;">{{ test.questions.count }} {% trans "Question" %}{{ test.questions.count|pluralize }}
+            </h3>
             {% if user == test.author or user.is_staff %}
             <a href="{% url 'question_add' test_pk=test.pk %}" class="btn btn-secondary btn-sm"
                 style="display: flex; align-items: center; gap: 0.5rem;">
@@ -65,7 +67,7 @@
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
-                Add Question
+                {% trans "Add Question" %}
             </a>
             <a href="{% url 'test_analytics' pk=test.pk %}" class="btn btn-secondary btn-sm"
                 style="display: flex; align-items: center; gap: 0.5rem; margin-left: 0.5rem;">
@@ -75,7 +77,7 @@
                     <line x1="12" y1="20" x2="12" y2="4"></line>
                     <line x1="6" y1="20" x2="6" y2="14"></line>
                 </svg>
-                Analytics
+                {% trans "Analytics" %}
             </a>
             {% endif %}
         </div>
@@ -93,9 +95,10 @@
             {% empty %}
             <div class="text-center"
                 style="padding: 3rem; background: var(--background); border-radius: var(--radius);">
-                <p class="text-muted">No questions have been added yet.</p>
+                <p class="text-muted">{% trans "No questions have been added yet." %}</p>
                 {% if user == test.author or user == test.author %}
-                <a href="{% url 'question_add' test_pk=test.pk %}" class="btn btn-primary mt-3">Add First Question</a>
+                <a href="{% url 'question_add' test_pk=test.pk %}" class="btn btn-primary mt-3">{% trans "Add First
+                    Question" %}</a>
                 {% endif %}
             </div>
             {% endfor %}
@@ -110,13 +113,14 @@
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            Back to Tests
+            {% trans "Back to Tests" %}
         </a>
         {% if user.is_staff or user == test.author %}
+        {% trans "Are you sure you want to delete this test?" as del_msg %}
         <a href="{% url 'test_delete' pk=test.pk %}" class="btn btn-secondary"
             style="color: var(--danger); border-color: var(--danger);"
-            onclick="return confirm('Are you sure you want to delete this test?');">
-            Delete Test
+            onclick="return confirm('{{ del_msg|escapejs }}');">
+            {% trans "Delete Test" %}
         </a>
         {% endif %}
     </div>

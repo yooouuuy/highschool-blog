@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from users.models import YEAR_CHOICES, STREAM_CHOICES, SUBJECT_CHOICES
 
 class Lesson(models.Model):
@@ -47,10 +48,10 @@ class Question(models.Model):
     option_c = models.CharField(max_length=200)
     option_d = models.CharField(max_length=200)
     correct_option = models.CharField(max_length=1, choices=[
-        ('A', 'Option A'),
-        ('B', 'Option B'),
-        ('C', 'Option C'),
-        ('D', 'Option D'),
+        ('A', _('Option A')),
+        ('B', _('Option B')),
+        ('C', _('Option C')),
+        ('D', _('Option D')),
     ])
 
     def __str__(self):
@@ -83,9 +84,9 @@ class ChatMessage(models.Model):
 
 class Resource(models.Model):
     RESOURCE_TYPES = [
-        ('pdf', 'PDF Document'),
-        ('video', 'Video Link'),
-        ('link', 'External Link'),
+        ('pdf', _('PDF Document')),
+        ('video', _('Video Link')),
+        ('link', _('External Link')),
     ]
     title = models.CharField(max_length=200)
     type = models.CharField(max_length=10, choices=RESOURCE_TYPES)
@@ -103,9 +104,9 @@ class Resource(models.Model):
 
 class ForumThread(models.Model):
     CATEGORY_CHOICES = [
-        ('question', 'Question'),
-        ('discussion', 'General Discussion'),
-        ('resource', 'Resource Share'),
+        ('question', _('Question')),
+        ('discussion', _('General Discussion')),
+        ('resource', _('Resource Share')),
     ]
     
     title = models.CharField(max_length=200)

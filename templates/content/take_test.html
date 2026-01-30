@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div style="max-width: 800px; margin: 0 auto;">
@@ -6,11 +7,13 @@
         <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <div>
                 <h1 class="mb-1" style="font-size: 2rem;">{{ test.title }}</h1>
-                <p class="text-muted" style="margin: 0;">{{ test.questions.count }} Question{{ test.questions.count|pluralize }}</p>
+                <p class="text-muted" style="margin: 0;">{{ test.questions.count }} {% trans "Question" %}{{
+                    test.questions.count|pluralize }}</p>
             </div>
             <div style="text-align: right;">
-                <span class="badge badge-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Test in
-                    Progress</span>
+                <span class="badge badge-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                    {% trans "Test in Progress" %}
+                </span>
             </div>
         </div>
 
@@ -20,7 +23,8 @@
             <div class="mb-5" style="border-bottom: 1px solid var(--background); padding-bottom: 2.5rem;">
                 <div style="display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1.5rem;">
                     <span
-                        style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;">{{ forloop.counter }}</span>
+                        style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;">{{
+                        forloop.counter }}</span>
                     <h3 style="font-size: 1.25rem; line-height: 1.4; margin: 0;">{{ question.text }}</h3>
                 </div>
 
@@ -52,16 +56,17 @@
             <div class="flex" style="justify-content: center; gap: 1rem; margin-top: 1rem;">
                 <button type="submit" class="btn btn-primary"
                     style="padding: 1rem 3rem; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
-                    Submit Test Answers
+                    {% trans "Submit Test Answers" %}
                 </button>
             </div>
         </form>
     </div>
 
     <div class="mt-4 text-center">
+        {% trans "Are you sure you want to abandon this test? Your answers will not be saved." as abandon_msg %}
         <a href="{% url 'test_detail' pk=test.pk %}" class="text-muted"
-            onclick="return confirm('Are you sure you want to abandon this test? Your answers will not be saved.')"
-            style="font-size: 0.9rem;">Abandon Test</a>
+            onclick="return confirm('{{ abandon_msg|escapejs }}')" style="font-size: 0.9rem;">{% trans "Abandon Test"
+            %}</a>
     </div>
 </div>
 
@@ -72,9 +77,9 @@
         cursor: pointer;
         padding: 1rem;
         border-radius: var(--radius);
-        border: 2px solid var(--background);
+        border: 2px solid var(--border);
         transition: all 0.2s;
-        background: white;
+        background: var(--surface);
     }
 
     .option-label:hover {

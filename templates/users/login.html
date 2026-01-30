@@ -1,19 +1,20 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div style="max-width: 450px; margin: 5rem auto; padding: 0 1rem;">
     <div class="card" style="padding: 3rem; border-top: 5px solid var(--primary); box-shadow: var(--shadow-xl);">
         <div class="text-center mb-5">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">ðŸ”</div>
-            <h2 style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--text);">Welcome Back</h2>
-            <p style="color: var(--text-muted);">Please enter your credentials</p>
+            <div style="font-size: 3rem; margin-bottom: 1rem;">👋</div>
+            <h2 style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--text);">{% trans "Welcome Back" %}</h2>
+            <p style="color: var(--text-muted);">{% trans "Please enter your credentials" %}</p>
         </div>
 
         <form method="post">
             {% csrf_token %}
 
             <div class="form-group">
-                <label class="form-label" style="font-weight: 600;">Username</label>
+                <label class="form-label" style="font-weight: 600;">{% trans "Username" %}</label>
                 <div style="position: relative;">
                     <span
                         style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);">
@@ -24,15 +25,16 @@
                         </svg>
                     </span>
                     <input type="text" name="username" id="id_username" class="form-input" style="padding-left: 3rem;"
-                        placeholder="Your username" required autofocus>
+                        placeholder="{% trans 'Your username' %}" required autofocus>
                 </div>
                 {% if form.username.errors %}
-                <small style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; display: block;">{{ form.username.errors.0 }}</small>
+                <small style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; display: block;">{{
+                    form.username.errors.0 }}</small>
                 {% endif %}
             </div>
 
             <div class="form-group" style="margin-top: 1.5rem;">
-                <label class="form-label" style="font-weight: 600;">Password</label>
+                <label class="form-label" style="font-weight: 600;">{% trans "Password" %}</label>
                 <div style="position: relative;">
                     <span
                         style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);">
@@ -43,10 +45,11 @@
                         </svg>
                     </span>
                     <input type="password" name="password" id="id_password" class="form-input"
-                        style="padding-left: 3rem;" placeholder="Your password" required>
+                        style="padding-left: 3rem;" placeholder="{% trans 'Your password' %}" required>
                 </div>
                 {% if form.password.errors %}
-                <small style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; display: block;">{{ form.password.errors.0 }}</small>
+                <small style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; display: block;">{{
+                    form.password.errors.0 }}</small>
                 {% endif %}
             </div>
 
@@ -59,14 +62,14 @@
 
             <button type="submit" class="btn btn-primary"
                 style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 2rem; font-weight: 600;">
-                Log In
+                {% trans "Log In" %}
             </button>
         </form>
 
         <div style="margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center;">
             <p style="font-size: 0.95rem; color: var(--text-muted);">
-                Don't have an account? <a href="{% url 'register' %}"
-                    style="font-weight: 600; color: var(--primary);">Create one now</a>
+                {% trans "Don't have an account?" %} <a href="{% url 'register' %}"
+                    style="font-weight: 600; color: var(--primary);">{% trans "Create one now" %}</a>
             </p>
         </div>
     </div>

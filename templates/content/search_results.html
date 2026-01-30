@@ -1,23 +1,24 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Search Results - Zin Highschool{% endblock %}
+{% block title %}{% trans "Search Results" %} - Zin Highschool{% endblock %}
 
 {% block content %}
 <div class="header-section">
-    <h1>Search Results</h1>
-    <p>Results for "{{ query }}"</p>
+    <h1>{% trans "Search Results" %}</h1>
+    <p>{% trans "Results for" %} "{{ query }}"</p>
 </div>
 
 <div class="search-results">
     {% if not lessons and not tests and not resources %}
     <div class="empty-state">
-        <p>No results found for your query.</p>
+        <p>{% trans "No results found for your query." %}</p>
     </div>
     {% else %}
 
     {% if lessons %}
     <section class="mb-4">
-        <h2 class="section-title">Lessons</h2>
+        <h2 class="section-title">{% trans "Lessons" %}</h2>
         <div class="grid">
             {% for lesson in lessons %}
             <article class="card">
@@ -28,12 +29,13 @@
                 <div class="card-body">
                     <p>{{ lesson.content|striptags|truncatewords:20 }}</p>
                     <div class="meta-info">
-                        <span>By {{ lesson.author.nickname|default:lesson.author.username }}</span>
+                        <span>{% trans "By" %} {{ lesson.author.nickname|default:lesson.author.username }}</span>
                         <span>{{ lesson.created_at|date:"M d, Y" }}</span>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="{% url 'lesson_detail' lesson.pk %}" class="btn btn-primary btn-sm">Read More</a>
+                    <a href="{% url 'lesson_detail' lesson.pk %}" class="btn btn-primary btn-sm">{% trans "Read More"
+                        %}</a>
                 </div>
             </article>
             {% endfor %}
@@ -43,7 +45,7 @@
 
     {% if tests %}
     <section class="mb-4">
-        <h2 class="section-title">Tests</h2>
+        <h2 class="section-title">{% trans "Tests" %}</h2>
         <div class="grid">
             {% for test in tests %}
             <article class="card">
@@ -54,12 +56,12 @@
                 <div class="card-body">
                     <p>{{ test.description|truncatewords:20 }}</p>
                     <div class="meta-info">
-                        <span>By {{ test.author.nickname|default:test.author.username }}</span>
-                        <span>{{ test.questions.count }} Questions</span>
+                        <span>{% trans "By" %} {{ test.author.nickname|default:test.author.username }}</span>
+                        <span>{{ test.questions.count }} {% trans "Questions" %}</span>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="{% url 'test_detail' test.pk %}" class="btn btn-primary btn-sm">View Test</a>
+                    <a href="{% url 'test_detail' test.pk %}" class="btn btn-primary btn-sm">{% trans "View Test" %}</a>
                 </div>
             </article>
             {% endfor %}
@@ -69,7 +71,7 @@
 
     {% if resources %}
     <section class="mb-4">
-        <h2 class="section-title">Library Resources</h2>
+        <h2 class="section-title">{% trans "Library Resources" %}</h2>
         <div class="grid">
             {% for resource in resources %}
             <article class="card">
@@ -85,15 +87,17 @@
                 </div>
                 <div class="card-body">
                     <div class="meta-info">
-                        <span>By {{ resource.author.nickname|default:resource.author.username }}</span>
+                        <span>{% trans "By" %} {{ resource.author.nickname|default:resource.author.username }}</span>
                         <span>{{ resource.created_at|date:"M d, Y" }}</span>
                     </div>
                 </div>
                 <div class="card-footer">
                     {% if resource.file %}
-                    <a href="{{ resource.file.url }}" class="btn btn-primary btn-sm" target="_blank">Download</a>
+                    <a href="{{ resource.file.url }}" class="btn btn-primary btn-sm" target="_blank">{% trans "Download"
+                        %}</a>
                     {% elif resource.url %}
-                    <a href="{{ resource.url }}" class="btn btn-primary btn-sm" target="_blank">View Link</a>
+                    <a href="{{ resource.url }}" class="btn btn-primary btn-sm" target="_blank">{% trans "View Link"
+                        %}</a>
                     {% endif %}
                 </div>
             </article>

@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div class="flex" style="justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
     <div>
-        <h1 class="mb-1">Resource Library</h1>
-        <p class="text-muted">{{ total_count }} Resource{{ total_count|pluralize }} available for download</p>
+        <h1 class="mb-1">{% trans "Resource Library" %}</h1>
+        <p class="text-muted">{{ total_count }} {% trans "Resource" %}{{ total_count|pluralize }} {% trans "available for download" %}</p>
     </div>
     {% if user.is_authenticated %}
-    <a href="{% url 'resource_create' %}" class="btn btn-primary">Upload Resource</a>
+    <a href="{% url 'resource_create' %}" class="btn btn-primary">{% trans "Upload Resource" %}</a>
     {% endif %}
 </div>
 
@@ -16,9 +17,9 @@
     <form method="GET" action="{% url 'resource_list' %}" class="flex"
         style="gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;">
         <div style="flex: 1; min-width: 150px;">
-            <label class="form-label">Year</label>
+            <label class="form-label">{% trans "Year" %}</label>
             <select name="year" id="year" class="form-input">
-                <option value="">All Years</option>
+                <option value="">{% trans "All Years" %}</option>
                 {% with current_year=filters.year|add:0 %}
                 {% for val, label in year_choices %}
                 <option value="{{ val }}" {% if current_year == val %}selected{% endif %}>{{ label }}</option>
@@ -28,9 +29,9 @@
         </div>
 
         <div style="flex: 1; min-width: 150px;">
-            <label class="form-label">Stream</label>
+            <label class="form-label">{% trans "Stream" %}</label>
             <select name="stream" id="stream" class="form-input">
-                <option value="">All Streams</option>
+                <option value="">{% trans "All Streams" %}</option>
                 {% with current_stream=filters.stream %}
                 {% for val, label in stream_choices %}
                 <option value="{{ val }}" {% if current_stream == val %}selected{% endif %}>{{ label }}</option>
@@ -40,9 +41,9 @@
         </div>
 
         <div style="flex: 1; min-width: 150px;">
-            <label class="form-label">Subject</label>
+            <label class="form-label">{% trans "Subject" %}</label>
             <select name="subject" id="subject" class="form-input">
-                <option value="">All Subjects</option>
+                <option value="">{% trans "All Subjects" %}</option>
                 {% with current_subject=filters.subject %}
                 {% for val, label in subject_choices %}
                 <option value="{{ val }}" {% if current_subject == val %}selected{% endif %}>{{ label }}</option>
@@ -52,9 +53,9 @@
         </div>
 
         <div style="flex: 1; min-width: 150px;">
-            <label class="form-label">Type</label>
+            <label class="form-label">{% trans "Type" %}</label>
             <select name="type" class="form-input">
-                <option value="">All Types</option>
+                <option value="">{% trans "All Types" %}</option>
                 {% with current_type=filters.type %}
                 {% for val, label in type_choices %}
                 <option value="{{ val }}" {% if current_type == val %}selected{% endif %}>{{ label }}</option>
@@ -64,25 +65,20 @@
         </div>
 
         <div class="flex" style="gap: 0.5rem;">
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <a href="{% url 'resource_list' %}" class="btn btn-secondary">Clear</a>
+            <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+            <a href="{% url 'resource_list' %}" class="btn btn-secondary">{% trans "Clear" %}</a>
         </div>
     </form>
 </section>
 
 {{ subject_choices|json_script:"subject-choices-data" }}
+{{ stream_choices|json_script:"stream-choices-data" }}
 
 <script>
-    const streamChoices = {
-        'common_science': 'Common Science',
-        'common_literature': 'Common Literature',
-        'math': 'Math Stream',
-        'science': 'Science Stream',
-        'languages': 'Languages Stream',
-        'literature': 'Literature Stream',
-        'management_economics': 'Management & Economics Stream',
-        'civil_engineering': 'Civil Engineering Stream'
-    };
+    const streamChoices = JSON.parse(document.getElementById('stream-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
 
     const streamToSubjects = {
         'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
@@ -107,8 +103,9 @@
     function updateStreams() {
         const year = yearSelect.value;
         const currentStream = streamSelect.value;
+        const allStreamsText = "{% trans 'All Streams' %}";
 
-        streamSelect.innerHTML = '<option value="">All Streams</option>';
+        streamSelect.innerHTML = `<option value="">${allStreamsText}</option>`;
 
         let validStreams = [];
         if (year == '1') {
@@ -149,7 +146,8 @@
             }
         }
 
-        subjectSelect.innerHTML = '<option value="">All Subjects</option>';
+        const allSubjectsText = "{% trans 'All Subjects' %}";
+        subjectSelect.innerHTML = `<option value="">${allSubjectsText}</option>`;
         validSubjects.forEach(sub => {
             const option = document.createElement('option');
             option.value = sub;
@@ -171,7 +169,7 @@
     <article class="card">
         <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
             {% if resource.year %}
-            <span class="badge badge-year">Year {{ resource.year }}</span>
+            <span class="badge badge-year">{% trans "Year" %} {{ resource.year }}</span>
             {% endif %}
             {% if resource.subject %}
             <span class="badge badge-subject">{{ resource.get_subject_display }}</span>
@@ -183,7 +181,8 @@
 
         <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1rem;">
             {% with author=resource.author %}
-            <small class="text-muted">By: {{ author.nickname|default:author.real_name|default:author.username }}</small>
+            <small class="text-muted">{% trans "By:" %} {{
+                author.nickname|default:author.real_name|default:author.username }}</small>
             {% endwith %}
 
             <div class="flex" style="gap: 0.5rem;">
@@ -196,7 +195,7 @@
                         <polyline points="7 10 12 15 17 10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
-                    Download
+                    {% trans "Download" %}
                 </a>
                 {% elif resource.type == 'video' and resource.url %}
                 <a href="{{ resource.url }}" target="_blank" class="btn btn-primary btn-sm">
@@ -205,7 +204,7 @@
                         style="margin-right: 0.5rem;">
                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
                     </svg>
-                    Watch
+                    {% trans "Watch" %}
                 </a>
                 {% elif resource.url %}
                 <a href="{{ resource.url }}" target="_blank" class="btn btn-secondary btn-sm">
@@ -215,13 +214,14 @@
                         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                         <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                     </svg>
-                    Open Link
+                    {% trans "Open Link" %}
                 </a>
                 {% endif %}
                 {% if user.is_staff or user.is_teacher %}
+                {% trans "Delete this resource?" as del_msg %}
                 <a href="{% url 'resource_delete' pk=resource.pk %}" class="btn btn-secondary btn-sm"
                     style="color: var(--danger); border-color: var(--danger); padding: 0.25rem 0.5rem;"
-                    onclick="return confirm('Delete this resource?');">
+                    onclick="return confirm('{{ del_msg|escapejs }}');">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="3 6 5 6 21 6"></polyline>
@@ -234,7 +234,7 @@
     </article>
     {% empty %}
     <div class="card text-center" style="grid-column: 1 / -1; padding: 4rem;">
-        <p class="text-muted">No resources found matching your criteria.</p>
+        <p class="text-muted">{% trans "No resources found matching your criteria." %}</p>
     </div>
     {% endfor %}
 </div>

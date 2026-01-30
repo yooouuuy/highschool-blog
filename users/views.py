@@ -5,6 +5,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from .forms import CustomUserCreationForm, UserUpdateForm
+from .models import YEAR_CHOICES, STREAM_CHOICES
 
 def register_view(request):
     if request.method == 'POST':
@@ -15,7 +16,11 @@ def register_view(request):
             return redirect('registration_pending')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'users/register.html', {'form': form})
+    return render(request, 'users/register.html', {
+        'form': form,
+        'year_choices': YEAR_CHOICES,
+        'stream_choices': STREAM_CHOICES
+    })
 
 def registration_pending(request):
     return render(request, 'users/registration_pending.html')
@@ -47,7 +52,11 @@ def profile_edit(request):
             return redirect('home')
     else:
         form = UserUpdateForm(instance=request.user)
-    return render(request, 'users/profile_edit.html', {'form': form})
+    return render(request, 'users/profile_edit.html', {
+        'form': form,
+        'year_choices': YEAR_CHOICES,
+        'stream_choices': STREAM_CHOICES
+    })
 
 def teacher_profile(request, username):
     User = get_user_model()

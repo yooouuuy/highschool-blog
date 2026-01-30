@@ -99,6 +99,7 @@ class LessonCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['subject_choices'] = SUBJECT_CHOICES
         context['stream_choices'] = STREAM_CHOICES
+        context['year_choices'] = YEAR_CHOICES
         return context
 
 @login_required
@@ -129,7 +130,8 @@ def test_create(request):
     return render(request, 'content/test_form.html', {
         'form': form,
         'subject_choices': SUBJECT_CHOICES,
-        'stream_choices': STREAM_CHOICES
+        'stream_choices': STREAM_CHOICES,
+        'year_choices': YEAR_CHOICES
     })
 
 @login_required
@@ -470,7 +472,12 @@ def resource_create(request):
             return redirect('resource_list')
     else:
         form = ResourceForm()
-    return render(request, 'content/resource_form.html', {'form': form})
+    return render(request, 'content/resource_form.html', {
+        'form': form,
+        'year_choices': YEAR_CHOICES,
+        'stream_choices': STREAM_CHOICES,
+        'subject_choices': SUBJECT_CHOICES
+    })
 
 # Forum Views
 @login_required
@@ -532,7 +539,10 @@ def forum_thread_create(request, subject):
         form = ForumThreadForm(initial=initial)
     return render(request, 'content/forum_thread_form.html', {
         'form': form,
-        'subject': subject
+        'subject': subject,
+        'year_choices': YEAR_CHOICES,
+        'stream_choices': STREAM_CHOICES,
+        'subject_choices': SUBJECT_CHOICES
     })
 
 @login_required

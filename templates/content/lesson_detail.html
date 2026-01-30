@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div style="max-width: 800px; margin: 0 auto;">
     <div class="card" style="padding: 2.5rem;">
         <div class="flex" style="gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-            {% if lesson.year %}<span class="badge badge-year">Year {{ lesson.year }}</span>{% endif %}
+            {% if lesson.year %}<span class="badge badge-year">{% trans "Year" %} {{ lesson.year }}</span>{% endif %}
             {% if lesson.stream %}<span class="badge badge-stream">{{ lesson.get_stream_display }}</span>{% endif %}
             {% if lesson.subject %}<span class="badge badge-subject">{{ lesson.get_subject_display }}</span>{% endif %}
         </div>
@@ -19,7 +20,7 @@
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                <span>Author: <a href="{% url 'teacher_profile' username=lesson.author.username %}"
+                <span>{% trans "Author:" %} <a href="{% url 'teacher_profile' username=lesson.author.username %}"
                         style="color: inherit; text-decoration: underline;">{% with author=lesson.author %}{{
                         author.nickname|default:author.real_name|default:author.username }}{% endwith %}</a></span>
             </div>
@@ -45,7 +46,7 @@
             <div style="display: flex; align-items: center; gap: 0.75rem;">
                 <span style="font-size: 1.5rem;">ðŸ“„</span>
                 <div>
-                    <h5 style="margin: 0; font-size: 1rem;">Attached PDF Document</h5>
+                    <h5 style="margin: 0; font-size: 1rem;">{% trans "Attached PDF Document" %}</h5>
                     <small class="text-muted">{{ lesson.pdf_file.name }}</small>
                 </div>
             </div>
@@ -57,7 +58,7 @@
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                Download PDF
+                {% trans "Download PDF" %}
             </a>
         </div>
         {% endif %}
@@ -65,7 +66,7 @@
         <hr style="border: 0; border-top: 1px solid var(--border); margin: 3rem 0;">
 
         <div class="comments-section">
-            <h3 class="mb-4">Discussion & Questions</h3>
+            <h3 class="mb-4">{% trans "Discussion & Questions" %}</h3>
 
             <div class="mb-5">
                 {% for comment in comments %}
@@ -93,10 +94,11 @@
                                         </a>
                                         {% if comment.author.is_teacher %}
                                         <span class="badge badge-primary"
-                                            style="font-size: 0.7rem; margin-left: 0.5rem;">Teacher</span>
+                                            style="font-size: 0.7rem; margin-left: 0.5rem;">{% trans "Teacher" %}</span>
                                         {% endif %}
                                     </h5>
-                                    <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
+                                    <small class="text-muted">{{ comment.created_at|timesince }} {% trans "ago"
+                                        %}</small>
                                 </div>
                                 <div style="font-size: 0.95rem; line-height: 1.5;">
                                     {{ comment.content|linebreaks }}
@@ -106,19 +108,19 @@
                     </div>
                 </div>
                 {% empty %}
-                <p class="text-muted mb-4">No comments yet. Be the first to start the discussion!</p>
+                <p class="text-muted mb-4">{% trans "No comments yet. Be the first to start the discussion!" %}</p>
                 {% endfor %}
             </div>
 
             <div class="card p-4">
-                <h4 class="mb-3">Leave a Reply</h4>
+                <h4 class="mb-3">{% trans "Leave a Reply" %}</h4>
                 <form method="post">
                     {% csrf_token %}
                     <div class="form-group">
                         {{ comment_form.content }}
                     </div>
                     <div style="text-align: right;">
-                        <button type="submit" class="btn btn-primary mt-2">Post Comment</button>
+                        <button type="submit" class="btn btn-primary mt-2">{% trans "Post Comment" %}</button>
                     </div>
                 </form>
             </div>
@@ -133,13 +135,14 @@
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            Back to Lessons
+            {% trans "Back to Lessons" %}
         </a>
         {% if user.is_staff or user == lesson.author %}
+        {% trans "Are you sure you want to delete this lesson?" as del_msg %}
         <a href="{% url 'lesson_delete' pk=lesson.pk %}" class="btn btn-secondary"
             style="color: var(--danger); border-color: var(--danger);"
-            onclick="return confirm('Are you sure you want to delete this lesson?');">
-            Delete Lesson
+            onclick="return confirm('{{ del_msg|escapejs }}');">
+            {% trans "Delete Lesson" %}
         </a>
         {% endif %}
     </div>

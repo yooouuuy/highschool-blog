@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
-<h1>Create Test</h1>
+<h1>{% trans "Create Test" %}</h1>
 <form method="post" enctype="multipart/form-data" class="card" style="padding: 2rem; max-width: 800px; margin: 0 auto;">
     {% csrf_token %}
     {% if form.non_field_errors %}
@@ -12,7 +13,8 @@
     {% endif %}
 
     <div style="margin-bottom: 1.5rem;">
-        <label for="id_title" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Title</label>
+        <label for="id_title" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Title"
+            %}</label>
         {{ form.title }}
         {% if form.title.errors %}
         <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
@@ -21,7 +23,8 @@
     </div>
 
     <div style="margin-bottom: 1.5rem;">
-        <label for="id_description" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Description</label>
+        <label for="id_description" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans
+            "Description" %}</label>
         {{ form.description }}
         {% if form.description.errors %}
         <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
@@ -30,8 +33,8 @@
     </div>
 
     <div style="margin-bottom: 1.5rem;">
-        <label for="id_pdf_file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">PDF File
-            (Optional)</label>
+        <label for="id_pdf_file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "PDF File
+            (Optional)" %}</label>
         {{ form.pdf_file }}
         {% if form.pdf_file.errors %}
         <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
@@ -41,7 +44,8 @@
 
     <div class="grid grid-cols-3" style="gap: 1.5rem; margin-bottom: 1.5rem;">
         <div>
-            <label for="id_year" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Year</label>
+            <label for="id_year" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Year"
+                %}</label>
             {{ form.year }}
             {% if form.year.errors %}
             <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
@@ -49,7 +53,8 @@
             {% endif %}
         </div>
         <div>
-            <label for="id_stream" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Stream</label>
+            <label for="id_stream" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Stream"
+                %}</label>
             {{ form.stream }}
             {% if form.stream.errors %}
             <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
@@ -57,7 +62,8 @@
             {% endif %}
         </div>
         <div>
-            <label for="id_subject" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Subject</label>
+            <label for="id_subject" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Subject"
+                %}</label>
             {{ form.subject }}
             {% if form.subject.errors %}
             <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{
@@ -68,25 +74,21 @@
 
     <div style="text-align: right;">
         <button type="submit" class="btn btn-primary">
-            {% if user.is_teacher or user.is_staff %}Create Test{% else %}Submit for Approval{% endif %}
+            {% if user.is_teacher or user.is_staff %}{% trans "Create Test" %}{% else %}{% trans "Submit for Approval"
+            %}{% endif %}
         </button>
-        <a href="{% url 'test_list' %}" class="btn btn-secondary">Cancel</a>
+        <a href="{% url 'test_list' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
     </div>
 </form>
 
 {{ subject_choices|json_script:"subject-choices-data" }}
+{{ stream_choices|json_script:"stream-choices-data" }}
 
 <script>
-    const streamChoices = {
-        'common_science': 'Common Science',
-        'common_literature': 'Common Literature',
-        'math': 'Math Stream',
-        'science': 'Science Stream',
-        'languages': 'Languages Stream',
-        'literature': 'Literature Stream',
-        'management_economics': 'Management & Economics Stream',
-        'civil_engineering': 'Civil Engineering Stream'
-    };
+    const streamChoices = JSON.parse(document.getElementById('stream-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
 
     const streamToSubjects = {
         'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],

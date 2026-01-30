@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div class="container-narrow">
     <div class="card">
-        <h1 class="mb-4">Upload New Resource</h1>
+        <h1 class="mb-4">{% trans "Upload New Resource" %}</h1>
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -24,26 +25,22 @@
 
             <div class="flex" style="gap: 1rem; margin-top: 2rem;">
                 <button type="submit" class="btn btn-primary">
-                    {% if user.is_teacher or user.is_staff %}Publish Resource{% else %}Submit for Approval{% endif %}
+                    {% if user.is_teacher or user.is_staff %}{% trans "Publish Resource" %}{% else %}{% trans "Submit
+                    for Approval" %}{% endif %}
                 </button>
-                <a href="{% url 'resource_list' %}" class="btn btn-secondary">Cancel</a>
+                <a href="{% url 'resource_list' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
             </div>
         </form>
     </div>
 </div>
 {{ subject_choices|json_script:"subject-choices-data" }}
+{{ stream_choices|json_script:"stream-choices-data" }}
 
 <script>
-    const streamChoices = {
-        'common_science': 'Common Science',
-        'common_literature': 'Common Literature',
-        'math': 'Math Stream',
-        'science': 'Science Stream',
-        'languages': 'Languages Stream',
-        'literature': 'Literature Stream',
-        'management_economics': 'Management & Economics Stream',
-        'civil_engineering': 'Civil Engineering Stream'
-    };
+    const streamChoices = JSON.parse(document.getElementById('stream-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
 
     const streamToSubjects = {
         'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],

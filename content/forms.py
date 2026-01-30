@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import Lesson, Test, Question, Announcement, Resource, ForumThread, ForumPost, LessonComment
 
 class LessonForm(forms.ModelForm):
@@ -39,10 +40,10 @@ class ResourceForm(forms.ModelForm):
         url = cleaned_data.get('url')
 
         if resource_type == 'pdf' and not file:
-            self.add_error('file', 'You must upload a PDF file.')
+            self.add_error('file', _('You must upload a PDF file.'))
         
         if resource_type in ['video', 'link'] and not url:
-            self.add_error('url', 'You must provide a URL.')
+            self.add_error('url', _('You must provide a URL.'))
             
         return cleaned_data
 
@@ -62,7 +63,7 @@ class ForumPostForm(forms.ModelForm):
         model = ForumPost
         fields = ['content']
         widgets = {
-            'content': forms.Textarea(attrs={'class': 'form-input', 'rows': 4, 'placeholder': 'Write your reply...'}),
+            'content': forms.Textarea(attrs={'class': 'form-input', 'rows': 4, 'placeholder': _('Write your reply...')}),
         }
 
 class LessonCommentForm(forms.ModelForm):
@@ -70,5 +71,5 @@ class LessonCommentForm(forms.ModelForm):
         model = LessonComment
         fields = ['content']
         widgets = {
-            'content': forms.Textarea(attrs={'class': 'form-input', 'rows': 3, 'placeholder': 'Ask a question or leave a comment...'}),
+            'content': forms.Textarea(attrs={'class': 'form-input', 'rows': 3, 'placeholder': _('Ask a question or leave a comment...')}),
         }

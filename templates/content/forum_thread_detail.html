@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div class="container-narrow">
     <nav class="mb-4">
-        <a href="{% url 'forum_subjects' %}" class="text-muted">Forums</a> /
+        <a href="{% url 'forum_subjects' %}" class="text-muted">{% trans "Forums" %}</a> /
         <a href="{% url 'forum_thread_list' subject=thread.subject %}" class="text-muted">{{ thread.get_subject_display
             }}</a> /
         <span>{{ thread.title }}</span>
@@ -12,16 +13,17 @@
     <div class="flex" style="justify-content: space-between; align-items: flex-start;">
         <div>
             <div class="flex mb-2" style="gap: 0.5rem;">
-                {% if thread.year %}<span class="badge badge-year">Year {{ thread.year }}</span>{% endif %}
+                {% if thread.year %}<span class="badge badge-year">{% trans "Year" %} {{ thread.year }}</span>{% endif %}
                 {% if thread.stream %}<span class="badge badge-stream">{{ thread.get_stream_display }}</span>{% endif %}
                 <span class="badge badge-secondary">{{ thread.get_category_display }}</span>
             </div>
             <h1 class="mb-5">{{ thread.title }}</h1>
         </div>
         {% if user.is_staff or user == thread.author %}
+        {% trans "Delete this entire discussion?" as del_msg %}
         <a href="{% url 'forum_thread_delete' pk=thread.pk %}" class="btn btn-secondary btn-sm"
             style="color: var(--danger); border-color: var(--danger);"
-            onclick="return confirm('Delete this entire discussion?');">Delete Thread</a>
+            onclick="return confirm('{{ del_msg|escapejs }}');">{% trans "Delete Thread" %}</a>
         {% endif %}
     </div>
 
@@ -36,7 +38,7 @@
                         }}</span>
                     {% endwith %}
                     {% if post.author.is_teacher %}
-                    <span class="badge badge-primary">Teacher</span>
+                    <span class="badge badge-primary">{% trans "Teacher" %}</span>
                     {% endif %}
                 </div>
                 <small class="text-muted">{{ post.created_at|date:"M j, Y - g:i A" }}</small>
@@ -50,13 +52,13 @@
 
     <!-- Reply Form -->
     <div class="card mt-5" style="border-top: 4px solid var(--primary);">
-        <h3 class="mb-4">Post a Reply</h3>
+        <h3 class="mb-4">{% trans "Post a Reply" %}</h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
                 {{ form.content }}
             </div>
-            <button type="submit" class="btn btn-primary mt-3">Submit Reply</button>
+            <button type="submit" class="btn btn-primary mt-3">{% trans "Submit Reply" %}</button>
         </form>
     </div>
 </div>
