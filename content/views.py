@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.translation import gettext as _
+
 from django.db.models import Q
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -67,7 +69,8 @@ class LessonDetailView(LoginRequiredMixin, DetailView):
             comment.lesson = self.object
             comment.author = request.user
             comment.save()
-            messages.success(request, 'Comment added successfully.')
+            messages.success(request, _('Comment added successfully.'))
+
             return redirect('lesson_detail', pk=self.object.pk)
         return self.render_to_response(self.get_context_data(comment_form=form))
 
@@ -81,10 +84,11 @@ class LessonCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         if self.request.user.is_teacher or self.request.user.is_staff:
             form.instance.is_approved = True
-            messages.success(self.request, 'Lesson published successfully.')
+            messages.success(self.request, _('Lesson published successfully.'))
         else:
             form.instance.is_approved = False
-            messages.success(self.request, 'Your lesson has been submitted for approval.')
+            messages.success(self.request, _('Your lesson has been submitted for approval.'))
+
         return super().form_valid(form)
 
     def get_initial(self):
@@ -112,12 +116,14 @@ def test_create(request):
             if request.user.is_teacher or request.user.is_staff:
                 test.is_approved = True
                 test.save()
-                messages.success(request, 'Test published successfully.')
+                messages.success(request, _('Test published successfully.'))
+
                 return redirect('test_detail', pk=test.pk)
             else:
                 test.is_approved = False
                 test.save()
-                messages.success(request, 'Your test has been submitted for approval.')
+                messages.success(request, _('Your test has been submitted for approval.'))
+
                 return redirect('test_list')
     else:
         initial = {
@@ -162,7 +168,8 @@ def take_test(request, pk):
     questions = test.questions.all()
     
     if not questions.exists():
-        messages.warning(request, "This test does not have any questions yet.")
+        messages.warning(request, _("This test does not have any questions yet."))
+
         return redirect('test_detail', pk=test.pk)
     
     if request.method == 'POST':
@@ -180,7 +187,8 @@ def take_test(request, pk):
                 score += 1
         
         if not all_answered:
-            messages.error(request, 'Please answer all questions before submitting.')
+            messages.error(request, _('Please answer all questions before submitting.'))
+
             return render(request, 'content/take_test.html', {
                 'test': test, 
                 'questions': questions,
@@ -204,7 +212,8 @@ def take_test(request, pk):
                 is_correct=(selected_opt == question.correct_option)
             )
 
-        messages.success(request, f'Test completed! Your score: {score}/{questions.count()}')
+        messages.success(request, _('Test completed! Your score: {score}/{total}').format(score=score, total=questions.count()))
+
         return redirect('result_detail', pk=result.pk)
     
     return render(request, 'content/take_test.html', {'test': test, 'questions': questions})
@@ -288,7 +297,8 @@ def approve_resource(request, pk):
     resource = get_object_or_404(Resource, pk=pk)
     resource.is_approved = True
     resource.save()
-    messages.success(request, f'Resource "{resource.title}" approved.')
+    messages.success(request, _('Resource "{title}" approved.').format(title=resource.title))
+
     return redirect('pending_lessons')
 
 @login_required
@@ -464,10 +474,11 @@ def resource_create(request):
             resource.author = request.user
             if request.user.is_teacher or request.user.is_staff:
                 resource.is_approved = True
-                messages.success(request, 'Resource uploaded successfully.')
+                messages.success(request, _('Resource uploaded successfully.'))
             else:
                 resource.is_approved = False
-                messages.success(request, 'Resource submitted for approval.')
+                messages.success(request, _('Resource submitted for approval.'))
+
             resource.save()
             return redirect('resource_list')
     else:
@@ -573,7 +584,8 @@ def forum_thread_detail(request, pk):
 def add_feedback(request, pk):
     result = get_object_or_404(Result, pk=pk)
     if request.user != result.test.author:
-        messages.error(request, "You can only leave feedback for tests you created.")
+        messages.error(request, _("You can only leave feedback for tests you created."))
+
         return redirect('result_detail', pk=result.pk)
         
     if request.method == 'POST':
@@ -582,7 +594,8 @@ def add_feedback(request, pk):
             result.teacher_feedback = feedback_text
             result.feedback_date = timezone.now()
             result.save()
-            messages.success(request, "Feedback added successfully.")
+            messages.success(request, _("Feedback added successfully."))
+
     
     return redirect('result_detail', pk=result.pk)
 
@@ -605,7 +618,8 @@ class LessonDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        messages.success(self.request, "Lesson deleted successfully.")
+        messages.success(self.request, _("Lesson deleted successfully."))
+
         return super().form_valid(form)
 
 @login_required
@@ -614,7 +628,8 @@ def delete_test(request, pk):
     test = get_object_or_404(Test, pk=pk)
     if request.user.is_staff or request.user == test.author:
         test.delete()
-        messages.success(request, "Test deleted successfully.")
+        messages.success(request, _("Test deleted successfully."))
+
     return redirect('test_list')
 
 @login_required
@@ -624,7 +639,8 @@ def delete_forum_thread(request, pk):
     subject = thread.subject
     if request.user.is_staff or request.user == thread.author:
         thread.delete()
-        messages.success(request, "Discussion thread deleted successfully.")
+        messages.success(request, _("Discussion thread deleted successfully."))
+
     return redirect('forum_thread_list', subject=subject)
 
 @login_required
@@ -633,7 +649,8 @@ def delete_resource(request, pk):
     resource = get_object_or_404(Resource, pk=pk)
     if request.user.is_staff or request.user == resource.author:
         resource.delete()
-        messages.success(request, "Resource deleted successfully.")
+        messages.success(request, _("Resource deleted successfully."))
+
     return redirect('resource_list')
 
 def search_view(request):

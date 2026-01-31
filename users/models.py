@@ -41,15 +41,16 @@ SUBJECT_CHOICES = [
 ]
 
 class CustomUser(AbstractUser):
-    is_teacher = models.BooleanField(default=False)
-    is_student = models.BooleanField(default=False)
+    is_teacher = models.BooleanField(_('Is Teacher'), default=False)
+    is_student = models.BooleanField(_('Is Student'), default=False)
     
-    real_name = models.CharField(max_length=100, default='')
-    nickname = models.CharField(max_length=50, blank=True)
-    bio = models.TextField(blank=True)
-    profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    year = models.IntegerField(choices=YEAR_CHOICES, null=True, blank=True, help_text='Year level (for students)')
-    stream = models.CharField(max_length=50, choices=STREAM_CHOICES, blank=True, help_text='Academic stream (for students)')
+    real_name = models.CharField(_('Real Name'), max_length=100, default='')
+    nickname = models.CharField(_('Nickname'), max_length=50, blank=True)
+    bio = models.TextField(_('Bio'), blank=True)
+    profile_pic = models.ImageField(_('Profile Picture'), upload_to='profile_pics/', blank=True, null=True)
+    year = models.IntegerField(_('Year'), choices=YEAR_CHOICES, null=True, blank=True, help_text=_('Year level (for students)'))
+    stream = models.CharField(_('Stream'), max_length=50, choices=STREAM_CHOICES, blank=True, help_text=_('Academic stream (for students)'))
+
     
     # Field to track when the user last cleared their chat history
     last_chat_clear_time = models.DateTimeField(null=True, blank=True)

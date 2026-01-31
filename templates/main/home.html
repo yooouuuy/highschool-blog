@@ -4,8 +4,7 @@
 {% block content %}
 <div class="hero fade-in">
     <h1>{% trans "Welcome to Mohammed El Zin Highschool" %}</h1>
-    <p>{% trans "Your platform for interactive learning and assessment. Explore lessons and take tests to improve your
-        knowledge." %}</p>
+    <p>{% trans "Your platform for interactive learning and assessment. Explore lessons and take tests to improve your knowledge." %}</p>
 </div>
 
 <div class="grid home-grid" style="grid-template-columns: 2fr 1fr;">
@@ -43,7 +42,7 @@
                 </article>
                 {% empty %}
                 <div class="card text-center" style="padding: 2rem; background: var(--background);">
-                    <p class="text-muted">No lessons available.</p>
+                    <p class="text-muted">{% trans "No lessons available." %}</p>
                 </div>
                 {% endfor %}
             </div>
@@ -81,7 +80,7 @@
                 </article>
                 {% empty %}
                 <div class="card text-center" style="padding: 2rem; background: var(--background);">
-                    <p class="text-muted">No tests are available at the moment.</p>
+                    <p class="text-muted">{% trans "No tests are available at the moment." %}</p>
                 </div>
                 {% endfor %}
             </div>
@@ -109,7 +108,7 @@
                 </div>
                 {% empty %}
                 <div class="card text-center" style="padding: 2rem; background: var(--background);">
-                    <p class="text-muted">No announcements are available at the moment.</p>
+                    <p class="text-muted">{% trans "No announcements are available at the moment." %}</p>
                 </div>
                 {% endfor %}
             </div>
@@ -225,7 +224,7 @@
                     div.className = `message-bubble ${msg.is_mine ? 'mine' : 'others'}`;
                     div.setAttribute('data-id', msg.id);
 
-                    const canDeleteOthers = {{ user.is_staff|yesno:"true,false" }} || {{ user.is_teacher|yesno:"true,false" }};
+                    const canDeleteOthers = "{{ user.is_staff|yesno:'true,false' }}" === "true" || "{{ user.is_teacher|yesno:'true,false' }}" === "true";
             let actionsHtml = '';
             if (msg.is_mine) {
                 actionsHtml = `
