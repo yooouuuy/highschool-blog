@@ -1,13 +1,18 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import Lesson, Test, Question, Announcement, Resource, ForumThread, ForumPost, LessonComment
+from core.validators import validate_file_size, validate_pdf_extension
 
 class LessonForm(forms.ModelForm):
+    pdf_file = forms.FileField(validators=[validate_file_size, validate_pdf_extension], required=False, label=_("PDF File"))
+
     class Meta:
         model = Lesson
         fields = ['title', 'content', 'year', 'stream', 'subject', 'pdf_file']
 
 class TestForm(forms.ModelForm):
+    pdf_file = forms.FileField(validators=[validate_file_size, validate_pdf_extension], required=False, label=_("PDF File"))
+
     class Meta:
         model = Test
         fields = ['title', 'description', 'year', 'stream', 'subject', 'pdf_file']
@@ -23,6 +28,8 @@ class AnnouncementForm(forms.ModelForm):
         fields = ['title', 'content']
 
 class ResourceForm(forms.ModelForm):
+    file = forms.FileField(validators=[validate_file_size], required=False, label=_("File"))
+
     class Meta:
         model = Resource
         fields = ['title', 'type', 'file', 'url', 'year', 'stream', 'subject']
@@ -42,6 +49,9 @@ class ResourceForm(forms.ModelForm):
         if resource_type == 'pdf' and not file:
             self.add_error('file', _('You must upload a PDF file.'))
         
+        if resource_type == 'pdf' and file:
+             validate_pdf_extension(file)
+
         if resource_type in ['video', 'link'] and not url:
             self.add_error('url', _('You must provide a URL.'))
             

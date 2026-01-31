@@ -16,6 +16,10 @@ from users.models import YEAR_CHOICES, STREAM_CHOICES, SUBJECT_CHOICES
 def is_teacher(user):
     return user.is_authenticated and user.is_active and (user.is_teacher or user.is_staff)
 
+from django.db.models import Q, Count
+
+# ... (imports)
+
 class LessonListView(ListView):
     model = Lesson
     template_name = 'content/lesson_list.html'
@@ -23,7 +27,7 @@ class LessonListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = Lesson.objects.filter(is_approved=True).order_by('-created_at')
+        queryset = Lesson.objects.select_related('author').filter(is_approved=True).order_by('-created_at')
         year = self.request.GET.get('year')
         stream = self.request.GET.get('stream')
         subject = self.request.GET.get('subject')
@@ -35,6 +39,20 @@ class LessonListView(ListView):
         if subject:
             queryset = queryset.filter(subject=subject)
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['announcements'] = Announcement.objects.all().order_by('-created_at')[:2]
+        context['year_choices'] = YEAR_CHOICES
+        context['stream_choices'] = STREAM_CHOICES
+        context['subject_choices'] = SUBJECT_CHOICES
+        context['filters'] = {
+            'year': self.request.GET.get('year'),
+            'stream': self.request.GET.get('stream'),
+            'subject': self.request.GET.get('subject')
+        }
+        context['total_count'] = self.get_queryset().count()
+        return context
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -226,7 +244,7 @@ def result_detail(request, pk):
     return render(request, 'content/result_detail.html', {'result': result})
 
 def test_list(request):
-    tests = Test.objects.filter(is_approved=True).order_by('-created_at')
+    tests = Test.objects.select_related('author').filter(is_approved=True).order_by('-created_at')
     
     year = request.GET.get('year')
     stream = request.GET.get('stream')
@@ -395,8 +413,10 @@ def get_messages(request, year, stream):
     if last_id:
         messages_query = messages_query.filter(id__gt=last_id)
     else:
-        # Load all history since last clear time (remove the 50-message limit)
-        messages_query = messages_query.order_by('created_at')
+        # Load only the last 50 messages locally to prevent huge payload
+        messages_query = messages_query.order_by('-created_at')[:50]
+        # Reverse back to chronological order for display
+        messages_query = reversed(messages_query)
 
     message_list = []
     for msg in messages_query:
@@ -439,7 +459,7 @@ def delete_chat_message(request, pk):
 
 # Library Views
 def resource_list(request):
-    resources = Resource.objects.filter(is_approved=True).order_by('-created_at')
+    resources = Resource.objects.select_related('author').filter(is_approved=True).order_by('-created_at')
     
     year = request.GET.get('year')
     stream = request.GET.get('stream')
@@ -499,7 +519,7 @@ def forum_subjects(request):
 
 @login_required
 def forum_thread_list(request, subject):
-    threads = ForumThread.objects.filter(subject=subject)
+    threads = ForumThread.objects.select_related('author').filter(subject=subject).annotate(posts_count=Count('posts'))
     category = request.GET.get('category')
     
     year = request.GET.get('year')

@@ -102,23 +102,23 @@
         div.className = `message-bubble ${msg.is_mine ? 'mine' : 'others'}`;
         div.setAttribute('data-id', msg.id);
 
-        const isPrivileged = {{ user.is_staff|yesno:"true,false" }} || {{ user.is_teacher|yesno:"true,false" }};
-    if (msg.is_mine) {
-        actionsHtml = `
+        const isPrivileged = "{{ user.is_staff|yesno:'true,false' }}" === "true" || "{{ user.is_teacher|yesno:'true,false' }}" === "true";
+        if (msg.is_mine) {
+            actionsHtml = `
                 <div class="message-actions">
                     <span class="action-btn edit" onclick="handleEdit(${msg.id})">{{ edit_label|escapejs }}</span>
                     <span class="action-btn delete" onclick="handleDelete(${msg.id})">{{ delete_label|escapejs }}</span>
                 </div>
             `;
-    } else if (isPrivileged) {
-        actionsHtml = `
+        } else if (isPrivileged) {
+            actionsHtml = `
                 <div class="message-actions">
                     <span class="action-btn delete" onclick="handleDelete(${msg.id})">{{ delete_label|escapejs }}</span>
                 </div>
             `;
-    }
+        }
 
-    div.innerHTML = `
+        div.innerHTML = `
             ${actionsHtml}
             <div class="message-info">
                 <strong>${msg.author}</strong>
@@ -126,7 +126,7 @@
             </div>
             <div class="message-text">${msg.text}</div>
         `;
-    return div;
+        return div;
     }
 
     async function handleEdit(id) {
@@ -279,7 +279,7 @@
     // Initial fetch
     fetchMessages();
 
-    // Poll for new messages every 3 seconds
-    setInterval(fetchMessages, 3000);
+    // Poll for new messages every 10 seconds
+    setInterval(fetchMessages, 10000);
 </script>
 {% endblock %}

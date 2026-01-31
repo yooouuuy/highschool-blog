@@ -8,8 +8,7 @@
             <div style="font-size: 3rem; margin-bottom: 1rem;" aria-hidden="true">✏️</div>
             <h2 style="font-size: 2.25rem; margin-bottom: 0.5rem; color: var(--text);">{% trans "Join Our Community" %}
             </h2>
-            <p style="color: var(--text-muted);">{% trans "Create your account to access lessons, tests, and class
-                chats." %}</p>
+            <p style="color: var(--text-muted);">{% trans "Create your account to access lessons, tests, and class chats." %}</p>
         </div>
 
         <form method="post" enctype="multipart/form-data" id="register-form" action="{% url 'register' %}" novalidate>
@@ -19,8 +18,7 @@
             <div role="group" aria-labelledby="role-selection-label"
                 style="background: var(--background); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 2.5rem;">
                 <label id="role-selection-label" class="form-label"
-                    style="text-align: center; display: block; margin-bottom: 1.25rem; font-weight: 700;">{% trans "I am
-                    joining as a:" %}</label>
+                    style="text-align: center; display: block; margin-bottom: 1.25rem; font-weight: 700;">{% trans "I am joining as a:" %}</label>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <label id="teacher-label" class="role-selector" for="id_is_teacher"
                         style="display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; padding: 1.25rem; border: 2px solid var(--border); border-radius: var(--radius); transition: all 0.3s; background: var(--surface); text-align: center;">
@@ -38,37 +36,13 @@
                     </label>
                 </div>
                 <small id="role-error" role="alert"
-                    style="color: var(--danger); display: none; text-align: center; margin-top: 0.75rem; font-weight: 600;">{%
-                    trans "Please select either Teacher or Student." %}</small>
+                    style="color: var(--danger); display: none; text-align: center; margin-top: 0.75rem; font-weight: 600;">{% trans "Please select either Teacher or Student." %}</small>
             </div>
 
             <div class="registration-section">
                 <h3 class="section-title">{% trans "Account Details" %}</h3>
 
-                <div class="form-group">
-                    <label class="form-label" for="id_nickname">{% trans "Nickname (Display Name)" %}</label>
-                    <div style="position: relative;">
-                        <span class="field-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="18"
-                                height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg></span>
-                        <input type="text" name="nickname" id="id_nickname" class="form-input with-icon"
-                            placeholder="{% trans 'How others will see you' %}"
-                            value="{{ form.nickname.value|default:'' }}"
-                            aria-describedby="{% if form.nickname.errors %}nickname-error{% endif %} nickname-help">
-                    </div>
-                    {% if form.nickname.help_text %}
-                    <small id="nickname-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{
-                        form.nickname.help_text }}</small>
-                    {% endif %}
-                    {% if form.nickname.errors %}
-                    <div id="nickname-error" role="alert"
-                        style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500;">
-                        {{ form.nickname.errors.0 }}
-                    </div>
-                    {% endif %}
-                </div>
+
 
                 <div class="form-group">
                     <label class="form-label" for="id_username">{% trans "Username" %}</label>
@@ -85,8 +59,7 @@
                             aria-describedby="{% if form.username.errors %}username-error{% endif %} username-help">
                     </div>
                     {% if form.username.help_text %}
-                    <small id="username-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{
-                        form.username.help_text }}</small>
+                    <small id="username-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{ form.username.help_text|safe }}</small>
                     {% endif %}
                     {% if form.username.errors %}
                     <div id="username-error" role="alert"
@@ -138,8 +111,7 @@
                             aria-describedby="{% if form.real_name.errors %}real_name-error{% endif %} real_name-help">
                     </div>
                     {% if form.real_name.help_text %}
-                    <small id="real_name-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{
-                        form.real_name.help_text }}</small>
+                    <small id="real_name-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{ form.real_name.help_text|safe }}</small>
                     {% endif %}
                     {% if form.real_name.errors %}
                     <div id="real_name-error" role="alert"
@@ -153,8 +125,7 @@
                     <label class="form-label" for="id_bio">{% trans "Bio (optional)" %}</label>
                     {{ form.bio }}
                     {% if form.bio.help_text %}
-                    <small id="bio-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{
-                        form.bio.help_text }}</small>
+                    <small id="bio-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{ form.bio.help_text|safe }}</small>
                     {% endif %}
                     {% if form.bio.errors %}
                     <div id="bio-error" role="alert"
@@ -168,8 +139,7 @@
                     <label class="form-label" for="id_profile_pic">{% trans "Profile Picture (optional)" %}</label>
                     {{ form.profile_pic }}
                     {% if form.profile_pic.help_text %}
-                    <small id="profile_pic-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{
-                        form.profile_pic.help_text }}</small>
+                    <small id="profile_pic-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{ form.profile_pic.help_text|safe }}</small>
                     {% endif %}
                     {% if form.profile_pic.errors %}
                     <div id="profile_pic-error" role="alert"
@@ -182,15 +152,13 @@
 
             <!-- Student Only Fields -->
             <div id="student-fields" style="display: none;" class="registration-section">
-                <h3 class="section-title" style="border-bottom-color: var(--primary); color: var(--primary);">{% trans
-                    "Academic Info" %}</h3>
+                <h3 class="section-title" style="border-bottom-color: var(--primary); color: var(--primary);">{% trans "Academic Info" %}</h3>
                 <div class="grid grid-cols-2" style="gap: 1.5rem;">
                     <div class="form-group">
                         <label class="form-label" for="id_year">{% trans "Year Level" %}</label>
                         {{ form.year }}
                         {% if form.year.help_text %}
-                        <small id="year-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{
-                            form.year.help_text }}</small>
+                        <small id="year-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{ form.year.help_text|safe }}</small>
                         {% endif %}
                         {% if form.year.errors %}
                         <div id="year-error" role="alert"
@@ -203,8 +171,7 @@
                         <label class="form-label" for="id_stream">{% trans "Stream" %}</label>
                         {{ form.stream }}
                         {% if form.stream.help_text %}
-                        <small id="stream-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{
-                            form.stream.help_text }}</small>
+                        <small id="stream-help" class="text-muted" style="display: block; margin-top: 0.5rem;">{{ form.stream.help_text|safe }}</small>
                         {% endif %}
                         {% if form.stream.errors %}
                         <div id="stream-error" role="alert"
@@ -270,8 +237,7 @@
             {% if form.non_field_errors or form.errors %}
             <div id="form-errors-container" role="alert"
                 style="background-color: var(--surface); border: 1px solid var(--danger); padding: 1.25rem; border-radius: var(--radius); margin-bottom: 2rem;">
-                <p style="color: var(--danger); font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">{% trans
-                    "Validation Errors:" %}</p>
+                <p style="color: var(--danger); font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">{% trans "Validation Errors:" %}</p>
                 <ul style="margin: 0; padding-left: 1.5rem;">
                     {% if form.non_field_errors %}
                     {% for error in form.non_field_errors %}
@@ -280,8 +246,7 @@
                     {% endif %}
                     {% for field, errors in form.errors.items %}
                     {% for error in errors %}
-                    <li style="color: var(--danger); font-size: 0.9rem; margin-bottom: 0.25rem;"><strong>{{ field|title
-                            }}</strong>: {{ error }}</li>
+                    <li style="color: var(--danger); font-size: 0.9rem; margin-bottom: 0.25rem;"><strong>{{ field|title }}</strong>: {{ error }}</li>
                     {% endfor %}
                     {% endfor %}
                 </ul>
@@ -459,19 +424,7 @@
         btnLoader.style.display = 'block';
     });
 
-    // Sync username with nickname
-    const nicknameInput = document.getElementById('id_nickname');
-    const usernameInput = document.getElementById('id_username');
 
-    if (nicknameInput && usernameInput) {
-        nicknameInput.addEventListener('input', function () {
-            // Only sync if username hasn't been manually edited or is empty
-            const val = this.value.toLowerCase()
-                .replace(/\s+/g, '_')
-                .replace(/[^\w.@+-]/g, '');
-            usernameInput.value = val;
-        });
-    }
 
     // Handle accessibility for role selectors (space/enter to toggle)
     [studentLabel, teacherLabel].forEach(label => {

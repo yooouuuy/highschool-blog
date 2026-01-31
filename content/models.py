@@ -84,6 +84,9 @@ class ChatMessage(models.Model):
 
     class Meta:
         ordering = ['created_at']
+        indexes = [
+            models.Index(fields=['year', 'stream', 'created_at']),
+        ]
 
     def __str__(self):
         return f"{self.author.username} - Year {self.year} {self.stream} - {self.created_at}"
