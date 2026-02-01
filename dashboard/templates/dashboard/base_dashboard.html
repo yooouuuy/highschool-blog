@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="dashboard-container" style="display: flex; min-height: 80vh; gap: 2rem; padding: 2rem 0;">
+
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar" style="width: 250px; flex-shrink: 0;">
+        <div class="card" style="padding: 1rem;">
+            <h3 style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;">
+                {% trans "Admin Dashboard" %}
+            </h3>
+            <nav style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="{% url 'dashboard:home' %}" class="btn"
+                    style="justify-content: flex-start; background: {% if request.resolver_match.url_name == 'home' %}var(--surface-hover){% else %}transparent{% endif %}; color: var(--text); border: 1px solid var(--border);">
+                    <span style="margin-right: 0.5rem;">📊</span> {% trans "Overview" %}
+                </a>
+                <a href="{% url 'dashboard:users' %}" class="btn"
+                    style="justify-content: flex-start; background: {% if request.resolver_match.url_name == 'users' %}var(--surface-hover){% else %}transparent{% endif %}; color: var(--text); border: 1px solid var(--border);">
+                    <span style="margin-right: 0.5rem;">👥</span> {% trans "Users" %}
+                </a>
+                <a href="{% url 'dashboard:content' %}" class="btn"
+                    style="justify-content: flex-start; background: {% if request.resolver_match.url_name == 'content' %}var(--surface-hover){% else %}transparent{% endif %}; color: var(--text); border: 1px solid var(--border);">
+                    <span style="margin-right: 0.5rem;">📚</span> {% trans "Content" %}
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main" style="flex-grow: 1;">
+        {% if messages %}
+        <div class="messages" style="margin-bottom: 1.5rem;">
+            {% for message in messages %}
+            <div class="alert {{ message.tags }}"
+                style="padding: 1rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); margin-bottom: 0.5rem;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block dashboard_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}
