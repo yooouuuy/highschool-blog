@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div class="card" style="padding: 2.5rem; border-bottom: 4px solid var(--primary);">
+        <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 class="mb-1" style="font-size: 2rem;">{{ test.title }}</h1>
+                <p class="text-muted" style="margin: 0;">{{ test.questions.count }} {% trans "Question" %}{{ test.questions.count|pluralize }}</p>
+            </div>
+            <div style="text-align: right;">
+                <span class="badge badge-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                    {% trans "Test in Progress" %}
+                </span>
+            </div>
+        </div>
+
+        <form method="post" id="test-form">
+            {% csrf_token %}
+            {% for question in questions %}
+            <div class="mb-5" style="border-bottom: 1px solid var(--background); padding-bottom: 2.5rem;">
+                <div style="display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <span
+                        style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;">{{ forloop.counter }}</span>
+                    <h3 style="font-size: 1.25rem; line-height: 1.4; margin: 0;">{{ question.text }}</h3>
+                </div>
+
+                <div class="grid" style="grid-template-columns: 1fr; gap: 1rem; padding-left: 2.5rem;">
+                    <label class="option-label">
+                        <input type="radio" name="question_{{ question.id }}" value="A" required>
+                        <span class="option-mark">A</span>
+                        <span class="option-text">{{ question.option_a }}</span>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="question_{{ question.id }}" value="B" required>
+                        <span class="option-mark">B</span>
+                        <span class="option-text">{{ question.option_b }}</span>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="question_{{ question.id }}" value="C" required>
+                        <span class="option-mark">C</span>
+                        <span class="option-text">{{ question.option_c }}</span>
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="question_{{ question.id }}" value="D" required>
+                        <span class="option-mark">D</span>
+                        <span class="option-text">{{ question.option_d }}</span>
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="flex" style="justify-content: center; gap: 1rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary"
+                    style="padding: 1rem 3rem; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
+                    {% trans "Submit Test Answers" %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="mt-4 text-center">
+        {% trans "Are you sure you want to abandon this test? Your answers will not be saved." as abandon_msg %} <a href="{% url 'test_detail' pk=test.pk %}" class="text-muted" onclick="return confirm('{{ abandon_msg|escapejs }}')" style="font-size: 0.9rem;">{% trans "Abandon Test" %}</a>
+    </div>
+</div>
+
+<style>
+    .option-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 1rem;
+        border-radius: var(--radius);
+        border: 2px solid var(--border);
+        transition: all 0.2s;
+        background: var(--surface);
+    }
+
+    .option-label:hover {
+        border-color: var(--border);
+        background: var(--background);
+    }
+
+    .option-label input {
+        display: none;
+    }
+
+    .option-mark {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--background);
+        border-radius: 6px;
+        margin-right: 1rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        transition: all 0.2s;
+    }
+
+    .option-text {
+        font-size: 1rem;
+        color: var(--text);
+    }
+
+    .option-label input:checked+.option-mark {
+        background: var(--primary);
+        color: white;
+    }
+
+    .option-label input:checked~.option-text {
+        font-weight: 600;
+    }
+
+    .option-label input:checked {
+        border-color: var(--primary);
+    }
+
+    .option-label:has(input:checked) {
+        border-color: var(--primary);
+        background-color: rgba(79, 70, 229, 0.03);
+    }
+</style>
+{% endblock %}

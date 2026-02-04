@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<h1 class="mb-5">{% trans "Student Dashboard" %}</h1>
+
+<div class="grid grid-cols-1" style="gap: 2rem;">
+    <!-- Test Results -->
+    <section class="card">
+        <h2 class="mb-4">{% trans "My Test Results" %}</h2>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                        <th style="padding: 1rem;">{% trans "Test" %}</th>
+                        <th style="padding: 1rem;">{% trans "Score" %}</th>
+                        <th style="padding: 1rem;">{% trans "Date Taken" %}</th>
+                        <th style="padding: 1rem;">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem; font-weight: 500;">{{ result.test.title }}</td>
+                        <td style="padding: 1rem;">
+                            <span class="badge badge-primary">{{ result.score }} / {{ result.total_questions }}</span>
+                        </td>
+                        <td style="padding: 1rem; color: var(--text-muted);">{{ result.date_taken|date:"M j, Y" }}</td>
+                        <td style="padding: 1rem;">
+                            <a href="{% url 'result_detail' pk=result.pk %}" class="btn btn-secondary btn-sm">{% trans "View Details" %}</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                            {% trans "No results found." %} <a href="{% url 'test_list' %}">{% trans "Take a test now!" %}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- My Pending Content -->
+    <section class="card">
+        <h2 class="mb-4">{% trans "My Pending Contributions" %}</h2>
+        <p class="text-muted mb-4">{% trans "These items are waiting to be reviewed and approved by a teacher." %}</p>
+
+        <div class="grid grid-cols-1" style="gap: 1.5rem;">
+            {% if pending_lessons or pending_tests or pending_resources %}
+
+            {% if pending_lessons %}
+            <div>
+                <h3 style="font-size: 1.1rem; border-left: 4px solid var(--primary); padding-left: 0.75rem;">{% trans "Lessons" %}</h3>
+                <ul style="list-style: none; padding: 0.5rem 0;">
+                    {% for item in pending_lessons %}
+                    <li class="flex"
+                        style="justify-content: space-between; padding: 0.75rem; border-bottom: 1px dashed var(--border);">
+                        <div class="flex" style="flex-direction: column; gap: 0.25rem;">
+                            <span style="font-weight: 500;">{{ item.title }}</span>
+                            <div class="flex" style="gap: 0.25rem; flex-wrap: wrap;">
+                                {% if item.year %}<span class="badge badge-year" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">Y {{ item.year }}</span>{% endif %}
+                                {% if item.stream %}<span class="badge badge-stream" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">{{ item.get_stream_display }}</span>{% endif %}
+                                {% if item.subject %}<span class="badge badge-subject" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">{{ item.get_subject_display }}</span>{% endif %}
+                            </div>
+                        </div>
+                        <span class="badge" style="background: rgba(0,0,0,0.05);">{% trans "Pending Review" %}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if pending_tests %}
+            <div class="mt-2">
+                <h3 style="font-size: 1.1rem; border-left: 4px solid var(--secondary); padding-left: 0.75rem;">{% trans "Tests" %}</h3>
+                <ul style="list-style: none; padding: 0.5rem 0;">
+                    {% for item in pending_tests %}
+                    <li class="flex"
+                        style="justify-content: space-between; padding: 0.75rem; border-bottom: 1px dashed var(--border);">
+                        <div class="flex" style="flex-direction: column; gap: 0.25rem;">
+                            <span style="font-weight: 500;">{{ item.title }}</span>
+                            <div class="flex" style="gap: 0.25rem; flex-wrap: wrap;">
+                                {% if item.year %}<span class="badge badge-year" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">Y {{ item.year }}</span>{% endif %}
+                                {% if item.stream %}<span class="badge badge-stream" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">{{ item.get_stream_display }}</span>{% endif %}
+                                {% if item.subject %}<span class="badge badge-subject" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">{{ item.get_subject_display }}</span>{% endif %}
+                            </div>
+                        </div>
+                        <span class="badge" style="background: rgba(0,0,0,0.05);">{% trans "Pending Review" %}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if pending_resources %}
+            <div class="mt-2">
+                <h3 style="font-size: 1.1rem; border-left: 4px solid var(--success); padding-left: 0.75rem;">{% trans "Resources" %}</h3>
+                <ul style="list-style: none; padding: 0.5rem 0;">
+                    {% for item in pending_resources %}
+                    <li class="flex"
+                        style="justify-content: space-between; padding: 0.75rem; border-bottom: 1px dashed var(--border);">
+                        <div class="flex" style="flex-direction: column; gap: 0.25rem;">
+                            <span style="font-weight: 500;">{{ item.title }}</span>
+                            <div class="flex" style="gap: 0.25rem; flex-wrap: wrap;">
+                                {% if item.year %}<span class="badge badge-year" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">Y {{ item.year }}</span>{% endif %}
+                                {% if item.stream %}<span class="badge badge-stream" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">{{ item.get_stream_display }}</span>{% endif %}
+                                {% if item.subject %}<span class="badge badge-subject" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">{{ item.get_subject_display }}</span>{% endif %}
+                            </div>
+                        </div>
+                        <span class="badge" style="background: rgba(0,0,0,0.05);">{% trans "Pending Review" %}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center"
+                style="padding: 2rem; background: var(--background); border-radius: var(--radius);">
+                <p class="text-muted">{% trans "You don't have any pending contributions at the moment." %}</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

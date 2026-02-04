@@ -1,0 +1,63 @@
+{% load i18n %}
+<div id="report-modal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+    <div class="card" style="width: 400px; padding: 2rem; background: var(--surface);">
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" x2="4" y1="22" y2="15"></line>
+            </svg>
+            {% trans "Report Content" %}
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+            {% trans "Help us keep our school safe. Why are you reporting this?" %}
+        </p>
+        <form id="report-form" method="post" action="">
+            {% csrf_token %}
+            <div style="margin-bottom: 1rem;">
+                <label style="display:block; margin-bottom:0.5rem;">{% trans "Reason" %}</label>
+                <select name="reason" class="form-control"
+                    style="width:100%; padding:0.5rem; background: var(--background); color: var(--text); border: 1px solid var(--border);">
+                    <option value="spam">{% trans "Spam" %}</option>
+                    <option value="abuse">{% trans "Abuse/Harassment" %}</option>
+                    <option value="off_topic">{% trans "Off-topic" %}</option>
+                    <option value="other">{% trans "Other" %}</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display:block; margin-bottom:0.5rem;">{% trans "Details (Optional)" %}</label>
+                <textarea name="description" class="form-control" rows="3"
+                    style="width:100%; padding:0.5rem; background: var(--background); color: var(--text); border: 1px solid var(--border);"
+                    placeholder="{% trans 'Provide more context...' %}"></textarea>
+            </div>
+            <div style="display:flex; gap:1rem; justify-content:flex-end;">
+                <button type="button" onclick="closeReportModal()" class="btn">{% trans "Cancel" %}</button>
+                <button type="submit" class="btn"
+                    style="background:var(--primary); color:white; padding: 0.5rem 1.5rem;">{% trans "Submit Report" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openReportModal(objId, ctId) {
+        const modal = document.getElementById('report-modal');
+        const form = document.getElementById('report-form');
+        // Construct the URL dynamically: /moderation/report/<ctId>/<objId>/
+        form.action = `/moderation/report/${ctId}/${objId}/`;
+        modal.style.display = 'flex';
+    }
+
+    function closeReportModal() {
+        document.getElementById('report-modal').style.display = 'none';
+    }
+
+    // Close on outside click
+    window.onclick = function (event) {
+        const modal = document.getElementById('report-modal');
+        if (event.target == modal) {
+            closeReportModal();
+        }
+    }
+</script>

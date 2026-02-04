@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container-narrow">
+    <div class="card">
+        <h1 class="mb-4">{% trans "Start New Discussion" %}</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group mb-4">
+                <label class="form-label">{% trans "Discussion Title" %}</label>
+                {{ form.title }}
+            </div>
+
+            <div class="grid grid-cols-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div>
+                    <label class="form-label">{% trans "Year" %}</label>
+                    {{ form.year }}
+                </div>
+                <div>
+                    <label class="form-label">{% trans "Stream" %}</label>
+                    {{ form.stream }}
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label">{% trans "Your Message" %}</label>
+                <textarea name="content" class="form-input" rows="6" placeholder="{% trans "What's on your mind?" %}"
+                    required></textarea>
+            </div>
+
+            <div class="flex" style="gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary">{% trans "Post Discussion" %}</button>
+                <a href="{% url 'forum_thread_list' subject=subject %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+            </div>
+        </form>
+    </div>
+</div>
+{{ subject_choices|json_script:"subject-choices-data" }}
+{{ stream_choices|json_script:"stream-choices-data" }}
+
+<script>
+    const streamChoices = JSON.parse(document.getElementById('stream-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const streamToSubjects = {
+        'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'common_literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'math': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'languages': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'german', 'spanish', 'philosophy'],
+        'literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'philosophy'],
+        'management_economics': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'accounting', 'law', 'economy'],
+        'civil_engineering': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'civil_eng']
+    };
+
+    const subjectChoices = JSON.parse(document.getElementById('subject-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const yearSelect = document.getElementById('id_year');
+    const streamSelect = document.getElementById('id_stream');
+    const subjectSelect = document.getElementById('id_subject');
+
+    function updateStreams() {
+        const year = yearSelect.value;
+        const currentStream = streamSelect.value;
+
+        streamSelect.innerHTML = '<option value="">---------</option>';
+
+        let validStreams = [];
+        if (year == '1') {
+            validStreams = ['common_science', 'common_literature'];
+        } else if (year == '2' || year == '3') {
+            validStreams = ['math', 'science', 'languages', 'literature', 'management_economics', 'civil_engineering'];
+        } else {
+            validStreams = Object.keys(streamChoices);
+        }
+
+        validStreams.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = streamChoices[s];
+            if (s === currentStream) option.selected = true;
+            streamSelect.appendChild(option);
+        });
+
+        updateSubjects();
+    }
+
+    function updateSubjects() {
+        const year = yearSelect.value;
+        const stream = streamSelect.value;
+        const currentSubject = subjectSelect.value;
+
+        let validSubjects = stream ? [...streamToSubjects[stream]] : Object.keys(subjectChoices);
+
+        if (year == '2') {
+            if (stream !== 'languages' && stream !== 'literature') {
+                validSubjects = validSubjects.filter(s => s !== 'philosophy');
+            }
+        } else if (year == '1') {
+            validSubjects = validSubjects.filter(s => s !== 'philosophy');
+        } else if (year == '3') {
+            if (!validSubjects.includes('philosophy')) {
+                validSubjects.push('philosophy');
+            }
+        }
+
+        subjectSelect.innerHTML = '<option value="">---------</option>';
+
+        validSubjects.forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub;
+            option.textContent = subjectChoices[sub];
+            if (sub === currentSubject) option.selected = true;
+            subjectSelect.appendChild(option);
+        });
+    }
+
+    if (yearSelect) {
+        yearSelect.addEventListener('change', updateStreams);
+        streamSelect.addEventListener('change', updateSubjects);
+        updateStreams();
+    } else {
+        // Fallback or static view mode
+        streamSelect.addEventListener('change', updateSubjects);
+        updateSubjects();
+    }
+</script>
+{% endblock %}

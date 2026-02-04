@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load i18n moderation_tags %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div class="card" style="padding: 2.5rem;">
+        <div class="flex" style="gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            {% if test.year %}<span class="badge badge-year">{% trans "Year" %} {{ test.year }}</span>{% endif %}
+            {% if test.stream %}<span class="badge badge-stream">{{ test.get_stream_display }}</span>{% endif %}
+            {% if test.subject %}<span class="badge badge-subject">{{ test.get_subject_display }}</span>{% endif %}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+            <h1 class="mb-2" style="font-size: 2.5rem; line-height: 1.2; flex: 1;">{{ test.title }}</h1>
+            {% if user.is_authenticated and user != test.author %}
+            <button onclick="openReportModal('{{ test.id }}', '{% get_content_type_id test %}')"
+                style="background:none; border:none; padding:0; cursor:pointer; color: var(--text-muted); margin-top: 0.5rem; display: flex; align-items: center; justify-content: center;"
+                title="{% trans 'Report Test' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                    <line x1="4" x2="4" y1="22" y2="15"></line>
+                </svg>
+            </button>
+            {% endif %}
+        </div>
+        <p class="text-muted mb-5"
+            style="font-size: 1.1rem; border-bottom: 2px solid var(--background); padding-bottom: 1.5rem;">
+            {{ test.description }}
+        </p>
+
+        {% if test.pdf_file %}
+        <div class="mb-5 p-4"
+            style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="color: var(--primary);">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14.5 2 14.5 7.5 20 7.5"></polyline>
+                </svg>
+                <div>
+                    <h5 style="margin: 0; font-size: 1rem;">{% trans "Attached PDF Document" %}</h5>
+                    <small class="text-muted">{{ test.pdf_file.name }}</small>
+                </div>
+            </div>
+            <a href="{{ test.pdf_file.url }}" target="_blank" class="btn btn-primary btn-sm" download
+                style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                {% trans "Download PDF" %}
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="flex"
+            style="justify-content: space-between; align-items: center; margin-bottom: 2.5rem; background: var(--background); padding: 1.5rem; border-radius: var(--radius);">
+            <div style="display: flex; flex-direction: column;">
+                <span style="font-weight: 500;">{% trans "Created by:" %} <a
+                        href="{% url 'teacher_profile' username=test.author.username %}"
+                        style="color: inherit; text-decoration: underline;">{% with author=test.author %}{{ author.display_name }}{% endwith %}</a></span>
+            </div>
+            {% if user.is_teacher %}
+            <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">{% trans
+                "Take Test (Preview)" %}</a>
+            {% else %}
+            <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">{% trans
+                "Take Test Now" %}</a>
+            {% endif %}
+        </div>
+
+        <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="margin: 0;">{{ test.questions.count }} {% trans "Question" %}{{ test.questions.count|pluralize }}
+            </h3>
+            {% if user == test.author or user.is_staff %}
+            <a href="{% url 'question_add' test_pk=test.pk %}" class="btn btn-secondary btn-sm"
+                style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                {% trans "Add Question" %}
+            </a>
+            <a href="{% url 'test_analytics' pk=test.pk %}" class="btn btn-secondary btn-sm"
+                style="display: flex; align-items: center; gap: 0.5rem; margin-left: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                {% trans "Analytics" %}
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1" style="gap: 1rem;">
+            {% for question in test.questions.all %}
+            <div class="card" style="padding: 1.25rem; background: #fcfcfc; border-style: dashed; box-shadow: none;">
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <span
+                        style="background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; font-weight: 700;">{{ forloop.counter }}</span>
+                    <strong style="font-weight: 500; font-size: 1.05rem;">{{ question.text }}</strong>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center"
+                style="padding: 3rem; background: var(--background); border-radius: var(--radius);">
+                <p class="text-muted">{% trans "No questions have been added yet." %}</p>
+                {% if user == test.author or user == test.author %}
+                <a href="{% url 'question_add' test_pk=test.pk %}" class="btn btn-primary mt-3">{% trans "Add First
+                    Question" %}</a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <a href="{% url 'test_list' %}" class="btn btn-secondary"
+            style="display: flex; align-items: center; gap: 0.5rem; width: fit-content;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            {% trans "Back to Tests" %}
+        </a>
+        {% if user.is_staff or user == test.author %}
+        {% trans "Are you sure you want to delete this test?" as del_msg %} <a href="{% url 'test_delete' pk=test.pk %}"
+            class="btn btn-secondary" style="color: var(--danger); border-color: var(--danger);"
+            onclick="return confirm('{{ del_msg|escapejs }}');"> {% trans "Delete Test" %}
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% include 'moderation/report_modal.html' %}
+{% endblock %}

@@ -1,0 +1,26 @@
+# local scripts
+fix_*.py
+audit_*.py
+test_*.py
+update_translations*.py
+append_translation.py
+check_mo_file.py
+compile_translations_polib.py
+
+# backups / outputs
+*.bak
+output.txt
+
+# python cache
+__pycache__/
+*.pyc
+
+db.sqlite3
+
+.env
+site_errors.log
+
+backups/
+scripts/
+
+media/

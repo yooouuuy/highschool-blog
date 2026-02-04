@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 4rem auto; text-align: center;">
+    <div class="card">
+        <h1 class="mb-4" style="color: var(--primary);">{% trans "Registration Successful" %}</h1>
+        <p style="font-size: 1.1rem; margin-bottom: 2rem;">
+            {% blocktrans  %}Thank you for registering at <strong>Mohammed El Zin Highschool</strong>.{% endblocktrans %}
+        </p>
+        <div
+            style="background-color: #fff3cd; color: #856404; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem; border: 1px solid #ffeeba;">
+            <strong>{% trans "Pending Approval" %}</strong>
+            <p class="mt-4" style="margin-bottom: 0;">
+                {% trans "Your account must be approved by a staff member before you can log in. Please wait for an administrator to review your details." %}
+            </p>
+        </div>
+        <a href="{% url 'home' %}" class="btn btn-primary">{% trans "Back to Home" %}</a>
+    </div>
+</div>
+{% endblock %}

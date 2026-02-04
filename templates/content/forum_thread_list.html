@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load i18n moderation_tags %}
+
+{% block content %}
+<div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <nav class="mb-2">
+            <a href="{% url 'forum_subjects' %}" class="text-muted">Forums</a> /
+            <span>{{ subject_display }}</span>
+        </nav>
+        <h1>{{ subject_display }} Discussions</h1>
+    </div>
+    <a href="{% url 'forum_thread_create' subject=subject %}" class="btn btn-primary">Start Discussion</a>
+</div>
+
+<!-- Filters -->
+<section class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
+    <form method="GET" action="{% url 'forum_thread_list' subject=subject %}" class="flex"
+        style="gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+        <input type="hidden" name="category" value="{{ current_category|default:'' }}">
+
+        <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Year</label>
+            <select name="year" id="year" class="form-input" style="width: 100%;">
+                <option value="">All Years</option>
+                {% with c_year=current_year|add:0 %}
+                {% for val, label in year_choices %}
+                <option value="{{ val }}" {% if c_year == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Stream</label>
+            <select name="stream" id="stream" class="form-input" style="width: 100%;">
+                <option value="">All Streams</option>
+                {% for val, label in stream_choices %}
+                <option value="{{ val }}" {% if current_stream == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="flex" style="gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="?subject={{ subject }}" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</section>
+
+<!-- Category Filters -->
+<div class="tabs-header mb-4">
+    <a href="?category=" class="tab-btn {% if not current_category %}active{% endif %}">All</a>
+    <a href="?category=question" class="tab-btn {% if current_category == 'question' %}active{% endif %}">Questions</a>
+    <a href="?category=discussion"
+        class="tab-btn {% if current_category == 'discussion' %}active{% endif %}">Discussion</a>
+    <a href="?category=resource" class="tab-btn {% if current_category == 'resource' %}active{% endif %}">Resources</a>
+</div>
+
+{{ SUBJECT_CHOICES|json_script:"subject-choices-data" }}
+{{ STREAM_CHOICES|json_script:"stream-choices-data" }}
+{{ YEAR_CHOICES|json_script:"year-choices-data" }}
+
+<script>
+    const streamChoices = JSON.parse(document.getElementById('stream-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const streamToSubjects = {
+        'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'common_literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'math': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'languages': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'german', 'spanish', 'philosophy'],
+        'literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'philosophy'],
+        'management_economics': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'accounting', 'law', 'economy'],
+        'civil_engineering': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'civil_eng']
+    };
+
+    const yearSelect = document.getElementById('year');
+    const streamSelect = document.getElementById('stream');
+
+    function updateStreams() {
+        const year = yearSelect.value;
+        const currentStream = streamSelect.value;
+
+        streamSelect.innerHTML = '<option value="">All Streams</option>';
+
+        let validStreams = [];
+        if (year == '1') {
+            validStreams = ['common_science', 'common_literature'];
+        } else if (year == '2' || year == '3') {
+            validStreams = ['math', 'science', 'languages', 'literature', 'management_economics', 'civil_engineering'];
+        } else {
+            validStreams = Object.keys(streamChoices);
+        }
+
+        validStreams.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = streamChoices[s];
+            if (s === currentStream) option.selected = true;
+            streamSelect.appendChild(option);
+        });
+    }
+
+    if (yearSelect) {
+        yearSelect.addEventListener('change', updateStreams);
+        if (yearSelect.value) updateStreams();
+    }
+</script>
+
+<div class="grid grid-cols-1" style="gap: 1rem;">
+    {% for thread in threads %}
+    <div class="card" style="padding: 0; position: relative;">
+        <a href="{% url 'forum_thread_detail' pk=thread.pk %}" class="flex"
+            style="align-items: center; justify-content: space-between; text-decoration: none; padding: 1.5rem; width: 100%;">
+            <div style="flex: 1;">
+                <div class="flex" style="align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; flex-wrap: wrap;">
+                    {% if thread.category == 'question' %}
+                    <span class="badge badge-primary">Question</span>
+                    {% elif thread.category == 'discussion' %}
+                    <span class="badge badge-secondary">Discussion</span>
+                    {% elif thread.category == 'resource' %}
+                    <span class="badge badge-outline"
+                        style="border: 1px solid var(--success); color: var(--success); background: rgba(16, 185, 129, 0.1);">Resource</span>
+                    {% endif %}
+
+                    {% if thread.year %}<span class="badge badge-year"
+                        style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">Y {{ thread.year }}</span>{% endif %}
+                    {% if thread.stream %}<span class="badge badge-stream"
+                        style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ thread.get_stream_display }}</span>{% endif %}
+
+                    <h3 class="mb-0" style="color: var(--text); font-size: 1.2rem; margin: 0;">{{ thread.title }}</h3>
+                </div>
+                {% with author=thread.author %}
+                <small class="text-muted">{% trans "Started by" %}
+                    {{ author.display_name }}
+                    • {{ thread.created_at|date:"M j, Y" }}</small>
+                {% endwith %}
+            </div>
+            <div class="flex" style="align-items: center; gap: 1rem; margin-left: 1rem;">
+                <div class="text-center">
+                    <span style="font-weight: 700; display: block;">{{ thread.posts_count }}</span>
+                    <small class="text-muted">{% trans "posts" %}</small>
+                </div>
+                <div class="badge badge-outline">{% trans "View" %}</div>
+            </div>
+        </a>
+        <div style="position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.25rem; z-index: 10;">
+            {% if user.is_authenticated and user != thread.author %}
+            <button onclick="openReportModal('{{ thread.id }}', '{% get_content_type_id thread %}')"
+                class="btn btn-secondary btn-sm"
+                style="padding: 0.25rem; display: flex; align-items: center; justify-content: center;"
+                title="{% trans 'Report' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                    <line x1="4" x2="4" y1="22" y2="15"></line>
+                </svg>
+            </button>
+            {% endif %}
+
+            {% if user.is_staff or user.is_teacher %}
+            {% trans "Delete this discussion thread?" as del_thread_msg %}
+            <a href="{% url 'forum_thread_delete' pk=thread.pk %}" class="btn btn-secondary btn-sm"
+                title="{% trans 'Delete Thread' %}"
+                style="padding: 0.25rem; color: var(--danger); border-color: var(--danger);"
+                onclick="return confirm('{{ del_thread_msg|escapejs }}');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="card text-center" style="padding: 4rem;">
+        <p class="text-muted">No discussions yet in this subject. Be the first to start one!</p>
+        <a href="{% url 'forum_thread_create' subject=subject %}" class="btn btn-primary mt-4">Create First Thread</a>
+    </div>
+    {% endfor %}
+</div>
+{% include 'moderation/report_modal.html' %}
+{% endblock %}

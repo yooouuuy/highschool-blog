@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<h1 class="mb-4">{% trans "Pending User Approvals" %}</h1>
+
+<div class="card">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                    <th style="padding: 1rem;">{% trans "Username" %}</th>
+                    <th style="padding: 1rem;">{% trans "Real Name" %}</th>
+                    <th style="padding: 1rem;">{% trans "Email" %}</th>
+                    <th style="padding: 1rem;">{% trans "Role" %}</th>
+                    <th style="padding: 1rem;">{% trans "Date Joined" %}</th>
+                    <th style="padding: 1rem;">{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 1rem; font-weight: 500;">{{ user.username }}</td>
+                    <td style="padding: 1rem;">{{ user.real_name }}</td>
+                    <td style="padding: 1rem;">{{ user.email }}</td>
+                    <td style="padding: 1rem;">
+                        {% if user.is_teacher %}
+                        <span class="badge badge-primary">{% trans "Teacher" %}</span>
+                        {% elif user.is_student %}
+                        <span class="badge badge-success">{% trans "Student" %}</span>
+                        {% else %}
+                        <span class="badge badge-secondary">{% trans "User" %}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem; color: var(--text-muted);">{{ user.date_joined|date:"M j, Y" }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="{% url 'approve_user' pk=user.pk %}" class="btn btn-primary"
+                            style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">{% trans "Approve" %}</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                        {% trans "No pending users." %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

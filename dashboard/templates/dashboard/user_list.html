@@ -1,0 +1,145 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block dashboard_content %}
+<div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>
+        {% trans "User Management" %}
+    </h2>
+    <style>
+        .filter-btn-active {
+            background: var(--primary);
+            color: white;
+            border: 1px solid var(--primary);
+        }
+
+        .filter-btn-inactive {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .filter-btn-inactive:hover {
+            border-color: var(--text);
+        }
+    </style>
+    <div class="filters" style="display: flex; gap: 0.5rem;">
+        <a href="?status=all"
+            class="btn {% if current_filter == 'all' %}filter-btn-active{% else %}filter-btn-inactive{% endif %}"
+            style="padding: 0.25rem 0.75rem; font-size: 0.9rem;">
+            {% trans "All" %}
+        </a>
+        <a href="?status=pending"
+            class="btn {% if current_filter == 'pending' %}filter-btn-active{% else %}filter-btn-inactive{% endif %}"
+            style="padding: 0.25rem 0.75rem; font-size: 0.9rem;">
+            {% trans "Pending" %}
+        </a>
+        <a href="?status=teachers"
+            class="btn {% if current_filter == 'teachers' %}filter-btn-active{% else %}filter-btn-inactive{% endif %}"
+            style="padding: 0.25rem 0.75rem; font-size: 0.9rem;">
+            {% trans "Teachers" %}
+        </a>
+    </div>
+</div>
+
+<div class="card" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+        <thead>
+            <tr style="background: var(--surface-hover); text-align: left;">
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">
+                    {% trans "Username" %}
+                </th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">
+                    {% trans "Role" %}
+                </th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">
+                    {% trans "Joined" %}
+                </th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">
+                    {% trans "Status" %}
+                </th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border); text-align: right;">
+                    {% trans "Actions" %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem;">
+                    <div style="font-weight: 600;">{{ user.username }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">{{ user.email }}</div>
+                </td>
+                <td style="padding: 1rem;">
+                    {% if user.is_teacher %}
+                    <span
+                        style="background: #e0f2fe; color: #0284c7; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">
+                        {% trans "Teacher" %}
+                    </span>
+                    {% elif user.is_student %}
+                    <span
+                        style="background: #f0fdf4; color: #16a34a; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">
+                        {% trans "Student" %}
+                    </span>
+                    {% else %}
+                    <span
+                        style="background: #f3f4f6; color: #4b5563; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">
+                        {% trans "Admin/Other" %}
+                    </span>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem; font-size: 0.9rem;">{{ user.date_joined|date:"M d, Y" }}</td>
+                <td style="padding: 1rem;">
+                    {% if user.is_active %}
+                    <span style="color: #16a34a;">● {% trans "Active" %}</span>
+                    {% else %}
+                    <span style="color: #dc2626;">● {% trans "Pending" %}</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem; text-align: right;">
+                    <form action="{% url 'dashboard:action' %}" method="post"
+                        style="display: inline-flex; gap: 0.5rem; align-items: center;">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" value="{{ user.id }}">
+                        <input type="hidden" name="item_type" value="user">
+
+                        {% if not user.is_active %}
+                        <button type="submit" name="action" value="approve" title="{% trans 'Approve' %}"
+                            style="background: none; border: none; cursor: pointer; color: #16a34a; font-size: 1.2rem;">
+                            ✅
+                        </button>
+                        {% else %}
+                        <button type="submit" name="action" value="deactivate" title="{% trans 'Deactivate' %}"
+                            style="background: none; border: none; cursor: pointer; color: #eab308; font-size: 1.2rem;">
+                            ⏸️
+                        </button>
+                        {% endif %}
+
+                        {% trans "Are you sure you want to delete this user?" as delete_confirm_msg %} <button type="submit" name="action" value="reject" title="{% trans 'Delete' %}" style="background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.2rem;" data-confirm="{{ delete_confirm_msg }}" onclick="return confirm(this.getAttribute('data-confirm'))"> 🗑️ </button> </form> </td> </tr> {% empty %} <tr> <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);"> {% trans "No users found." %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination (Simple) -->
+{% if is_paginated %}
+<div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.5rem;">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&status={{ current_filter }}" class="btn"
+        style="padding: 0.25rem 0.75rem;">
+        &laquo; {% trans "Prev" %}
+    </a>
+    {% endif %}
+    <span style="padding: 0.25rem 0.75rem;">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&status={{ current_filter }}" class="btn"
+        style="padding: 0.25rem 0.75rem;">
+        {% trans "Next" %} &raquo;
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

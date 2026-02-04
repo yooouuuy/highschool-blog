@@ -1,0 +1,241 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}zin blog{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=13">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav class="nav-container">
+            <a href="{% url 'home' %}" class="logo"
+                style="display: flex; flex-direction: column; line-height: 1.2; font-size: 1.4rem;">
+                <span>{% trans "Mohammed El Zin" %}</span>
+                <span style="font-size: 1.1rem; font-weight: 500; opacity: 0.9;">{% trans "Highschool" %}</span>
+            </a>
+
+            <form action="{% url 'search' %}" method="get" class="nav-search"
+                style="margin-left: 1rem; margin-right: 0.5rem; flex-grow: 1; display: flex; justify-content: center;">
+                <input type="text" name="q" placeholder="{% trans 'Search...' %}" required
+                    style="width: 100%; max-width: 100%;">
+                <button type="submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </form>
+
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
+                <span></span>
+            </label>
+            <div class="nav-overlay"></div>
+
+            <div class="theme-switch-wrapper" style="margin-right: 15px;">
+                <label class="theme-switch" for="theme-checkbox">
+                    <input type="checkbox" id="theme-checkbox" />
+                    <div class="slider">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="sun-icon">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="moon-icon">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Language Switch -->
+            <div class="theme-switch-wrapper" style="margin-right: 2.5rem;">
+                <form action="{% url 'set_language' %}" method="post" id="lang-form">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ redirect_to }}">
+                    <input name="language" type="hidden" id="lang-input">
+                    <label class="theme-switch" for="lang-checkbox" title="{% trans 'Switch Language' %}">
+                        <input type="checkbox" id="lang-checkbox" />
+                        <div class="slider">
+                            <span
+                                style="position: absolute; left: 4px; top: 3px; font-size: 10px; font-weight: bold;">EN</span>
+                            <span
+                                style="position: absolute; right: 4px; top: 3px; font-size: 10px; font-weight: bold;">AR</span>
+                        </div>
+                    </label>
+                </form>
+            </div>
+
+            <div class="nav-links">
+                <a href="{% url 'home' %}">{% trans "Home" %}</a>
+                <a href="{% url 'forum_subjects' %}">{% trans "Forums" %}</a>
+                <a href="{% url 'resource_list' %}">{% trans "Library" %}</a>
+                <a href="{% url 'lesson_list' %}">{% trans "Lessons" %}</a>
+                <a href="{% url 'test_list' %}">{% trans "Tests" %}</a>
+
+                {% if user.is_authenticated %}
+                {% if user.is_student and user.year and user.stream %}
+                <a href="{% url 'chat_room' year=user.year stream=user.stream %}">{% trans "Chat" %}</a>
+                {% endif %}
+
+                {% if user.is_staff or user.is_teacher %}
+                <a href="{% url 'pending_users' %}">{% trans "Pending Users" %}</a>
+                {% endif %}
+
+                {% if user.is_teacher or user.is_staff %}
+                <a href="{% url 'pending_lessons' %}">{% trans "Pending Lessons" %}</a>
+                <a href="{% url 'announcement_create' %}">{% trans "New Announcement" %}</a>
+                {% endif %}
+
+                {% if user.is_teacher %}
+                <span class="badge badge-primary">{% trans "Teacher" %}</span>
+                {% endif %}
+                {% if user.is_student %}
+                <a href="{% url 'student_dashboard' %}">{% trans "Dashboard" %}</a>
+                <span class="badge badge-primary">{% trans "Student" %}</span>
+                {% endif %}
+
+                <a href="{% url 'notification_list' %}" class="nav-icon-link"
+                    style="position: relative; display: flex; align-items: center; color: var(--text);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    {% if user.notifications.all.count > 0 %}
+                    <!-- We should probably use a context processor for the count, but for now linking to list is enough visually -->
+                    <span
+                        style="position: absolute; top: -5px; right: -5px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%;"></span>
+                    {% endif %}
+                </a>
+
+                <a href="{% url 'profile_edit' %}" class="nav-profile">
+                    {% if user.profile_pic %}
+                    <img src="{{ user.profile_pic.url }}" alt="Profile" class="nav-avatar">
+                    {% endif %}
+                    <span>{{ user.display_name }}</span>
+                </a>
+
+                <a href="{% url 'logout' %}" class="btn btn-secondary logout-btn">{% trans "Logout" %}</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-secondary">{% trans "Login" %}</a>
+                <a href="{% url 'register' %}" class="btn btn-primary">{% trans "Register" %}</a>
+                {% endif %}
+            </div>
+
+
+
+
+        </nav>
+    </header>
+
+    <main class="container fade-in">
+        {% if messages %}
+        <div style="margin-bottom: 1.5rem;">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="text-center mt-4 mb-4"
+        style="color: var(--text-muted); font-size: 0.875rem; border-top: 1px solid var(--border); padding-top: 2rem;">
+        <p>&copy; 2026 {% trans "Mohammed El Zin Highschool. All rights reserved." %}</p>
+    </footer>
+
+    {% get_current_language as LANGUAGE_CODE %}
+    <script>
+        const themeCheckbox = document.getElementById('theme-checkbox');
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+
+        if (currentTheme === 'dark') {
+            themeCheckbox.checked = true;
+        }
+
+        themeCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Language Switch Logic
+        const langCheckbox = document.getElementById('lang-checkbox');
+        const langForm = document.getElementById('lang-form');
+        const langInput = document.getElementById('lang-input');
+        const currentLang = "{{ LANGUAGE_CODE }}";
+
+        if (currentLang === 'ar') {
+            langCheckbox.checked = true;
+            document.documentElement.setAttribute('lang', 'ar');
+            document.documentElement.setAttribute('dir', 'rtl');
+        } else {
+            langCheckbox.checked = false;
+            document.documentElement.setAttribute('lang', 'en');
+            document.documentElement.setAttribute('dir', 'ltr');
+        }
+
+        langCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                // Determine we want Arabic
+                langInput.value = 'ar';
+            } else {
+                // Determine we want English
+                langInput.value = 'en';
+            }
+            langForm.submit();
+        });
+
+        // Smart Navbar Behavior
+        let lastScrollTop = 0;
+        const header = document.querySelector('header');
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scroll Down
+                header.classList.add('nav-hidden');
+            } else {
+                // Scroll Up
+                header.classList.remove('nav-hidden');
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, { passive: true });
+    </script>
+</body>
+
+</html>

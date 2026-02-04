@@ -1,0 +1,167 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block dashboard_content %}
+<div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>{% trans "Moderation Queue" %}</h2>
+    <div class="filters" style="display: flex; gap: 0.5rem;">
+        <a href="?status=pending"
+            class="btn {% if current_status == 'pending' %}filter-btn-active{% else %}filter-btn-inactive{% endif %}"
+            style="padding: 0.25rem 0.75rem;">
+            {% trans "Pending" %}
+        </a>
+        <a href="?status=resolved"
+            class="btn {% if current_status == 'resolved' %}filter-btn-active{% else %}filter-btn-inactive{% endif %}"
+            style="padding: 0.25rem 0.75rem;">
+            {% trans "Resolved" %}
+        </a>
+        <a href="?status=dismissed"
+            class="btn {% if current_status == 'dismissed' %}filter-btn-active{% else %}filter-btn-inactive{% endif %}"
+            style="padding: 0.25rem 0.75rem;">
+            {% trans "Dismissed" %}
+        </a>
+    </div>
+</div>
+
+<div class="card" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+        <thead>
+            <tr style="background: var(--surface-hover); text-align: left;">
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">{% trans "Target Content" %}</th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">{% trans "Reporter" %}</th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">{% trans "Reason" %}</th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">{% trans "Date" %}</th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border); text-align: right;">{% trans "Actions"
+                    %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem;">
+                    <div style="font-weight: 600;">{{ report.content_type.model|title }}: {{ report.object_id }}</div>
+                    <div
+                        style="font-size: 0.85rem; color: var(--text-muted); max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {% if report.content_object.content %}
+                        {{ report.content_object.content|truncatechars:100 }}
+                        {% elif report.content_object.message %}
+                        {{ report.content_object.message|truncatechars:100 }}
+                        {% elif report.content_object.title %}
+                        {{ report.content_object.title }}
+                        {% else %}
+                        {{ report.content_object }}
+                        {% endif %}
+                    </div>
+                </td>
+                <td style="padding: 1rem;">{{ report.reporter.username }}</td>
+                <td style="padding: 1rem;">
+                    <span class="badge"
+                        style="background: var(--surface-hover); padding: 0.2rem 0.5rem; border-radius: 4px;">{{
+                        report.get_reason_display }}</span>
+                    {% if report.description %}
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">{{
+                        report.description|truncatechars:50 }}</div>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem; font-size: 0.9rem;">{{ report.created_at|date:"M d, H:i" }}</td>
+                <td style="padding: 1rem; text-align: right;">
+                    {% if report.status == 'pending' %}
+                    <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                        <form action="{% url 'moderation:report_action' report.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="dismiss">
+                            <button type="submit" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;"
+                                title="{% trans 'Dismiss' %}">
+                                🚫
+                            </button>
+                        </form>
+                        <form action="{% url 'moderation:report_action' report.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="hide">
+                            <button type="submit" class="btn"
+                                style="padding: 0.25rem 0.5rem; font-size: 0.8rem; color: #dc2626;"
+                                title="{% trans 'Hide Content' %}">
+                                🗑️
+                            </button>
+                        </form>
+                        <button onclick="document.getElementById('action-modal-{{ report.id }}').style.display='flex'"
+                            class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; color: #eab308;"
+                            title="{% trans 'More Actions' %}">
+                            ⚖️
+                        </button>
+                    </div>
+
+                    <!-- Simple Modal for Suspend/Notes -->
+                    <div id="action-modal-{{ report.id }}"
+                        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+                        <div class="card" style="width: 400px; padding: 2rem;">
+                            <h3>{% trans "Moderation Action" %}</h3>
+                            <form action="{% url 'moderation:report_action' report.id %}" method="post">
+                                {% csrf_token %}
+                                <div style="margin-bottom: 1rem;">
+                                    <label>{% trans "Action" %}</label>
+                                    <select name="action" class="form-control"
+                                        style="width:100%; padding:0.5rem; margin-top:0.5rem;">
+                                        <option value="warn">{% trans "Warn User" %}</option>
+                                        <option value="suspend">{% trans "Suspend User" %}</option>
+                                    </select>
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <label>{% trans "Days (for suspension)" %}</label>
+                                    <input type="number" name="days" value="3" class="form-control"
+                                        style="width:100%; padding:0.5rem; margin-top:0.5rem;">
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <label>{% trans "Moderator Note" %}</label>
+                                    <textarea name="note" class="form-control"
+                                        style="width:100%; padding:0.5rem; margin-top:0.5rem;"></textarea>
+                                </div>
+                                <div style="display:flex; gap:1rem; justify-content:flex-end;">
+                                    <button type="button"
+                                        onclick="this.closest('#action-modal-{{ report.id }}').style.display='none'"
+                                        class="btn">{% trans "Cancel" %}</button>
+                                    <button type="submit" class="btn" style="background:var(--primary); color:white;">{%
+                                        trans "Submit" %}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">
+                        {% if report.moderator %}
+                        {% trans "By" %} {{ report.moderator.username }}
+                        {% endif %}
+                    </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                    {% trans "No reports found." %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .filter-btn-active {
+        background: var(--primary);
+        color: white;
+        border: 1px solid var(--primary);
+    }
+
+    .filter-btn-inactive {
+        background: transparent;
+        border: 1px solid var(--border);
+    }
+
+    .form-control {
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        resize: none !important;
+    }
+</style>
+{% endblock %}

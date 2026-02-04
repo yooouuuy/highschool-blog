@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Analytics:" %} {{ test.title }}{% endblock %}
+
+{% block content %}
+<style>
+    .accuracy-bar {
+        width: 100px;
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .accuracy-fill {
+        height: 100%;
+    }
+
+    .accuracy-low {
+        background: var(--danger);
+    }
+
+    .accuracy-mid {
+        background: #f59e0b;
+    }
+
+    .accuracy-high {
+        background: var(--success);
+    }
+</style>
+<div class="container-narrow">
+    <div class="flex-between-center mb-4">
+        <h1>{% trans "Analytics:" %} {{ test.title }}</h1>
+        <a href="{% url 'test_detail' test.pk %}" class="btn btn-secondary">{% trans "Back to Test" %}</a>
+    </div>
+
+    {% if total_students == 0 %}
+    <div class="card p-5 text-center">
+        <p class="text-muted">{% trans "No students have taken this test yet." %}</p>
+    </div>
+    {% else %}
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-4 mb-5" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="card text-center p-4">
+            <h3 class="mb-1" style="color: var(--primary); font-size: 2.5rem;">{{ total_students }}</h3>
+            <p class="text-muted m-0">{% trans "Students Taken" %}</p>
+        </div>
+        <div class="card text-center p-4">
+            <h3 class="mb-1" style="color: var(--success); font-size: 2.5rem;">{{ avg_score }}</h3>
+            <p class="text-muted m-0">{% trans "Average Score" %}</p>
+        </div>
+        <div class="card text-center p-4">
+            <h3 class="mb-1" style="color: var(--text); font-size: 2.5rem;">{{ max_score }}</h3>
+            <p class="text-muted m-0">{% trans "Highest Score" %}</p>
+        </div>
+        <div class="card text-center p-4">
+            <h3 class="mb-1" style="color: var(--danger); font-size: 2.5rem;">{{ min_score }}</h3>
+            <p class="text-muted m-0">{% trans "Lowest Score" %}</p>
+        </div>
+    </div>
+
+    <!-- Question Analysis -->
+    <div class="card mb-5">
+        <div class="card-header p-4 border-bottom">
+            <h2 class="h3 m-0">{% trans "Question Breakdown" %}</h2>
+            <p class="text-muted m-0">{% trans "Ordered by difficulty (lowest accuracy first)" %}</p>
+        </div>
+        <div class="table-responsive">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); background: var(--background);">
+                        <th style="padding: 1rem; text-align: left; width: 50%;">{% trans "Question" %}</th>
+                        <th style="padding: 1rem; text-align: center;">{% trans "Accuracy" %}</th>
+                        <th style="padding: 1rem; text-align: center;">{% trans "Correct" %}</th>
+                        <th style="padding: 1rem; text-align: center;">{% trans "Wrong" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in question_stats %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem;">
+                            <div style="font-weight: 500;">{% trans "Q:" %} {{ stat.question.text }}</div>
+                            <small class="text-muted">{% trans "Correct: Option" %} {{ stat.question.correct_option }}</small>
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                <div class="accuracy-bar">
+                                    <div class="accuracy-fill {% if stat.correct_percentage < 50 %}accuracy-low{% elif stat.correct_percentage < 80 %}accuracy-mid{% else %}accuracy-high{% endif %}"
+                                        style="width: {{ stat.correct_percentage }}%;">
+                                    </div>
+                                </div>
+                                <span style="font-weight: 600; font-size: 0.9rem;">{{ stat.correct_percentage }}%</span>
+                            </div>
+                        </td>
+                        <td style="padding: 1rem; text-align: center; color: var(--success);">{{ stat.total_attempts|add:"-"|add:stat.wrong_count }}</td>
+                        <td style="padding: 1rem; text-align: center; color: var(--danger);">{{ stat.wrong_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

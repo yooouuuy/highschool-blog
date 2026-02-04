@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="flex" style="justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+    <div>
+        <h1>{% trans "Tests" %}</h1>
+        {% if total_count %}
+        <p class="text-muted">{{ total_count }} {% trans "Test" %}{{ total_count|pluralize }} {% trans "available" %}
+        </p>
+        {% endif %}
+    </div>
+    {% if user.is_authenticated %}
+    <a href="{% url 'test_create' %}" class="btn btn-primary">{% trans "Create New Test" %}</a>
+    {% endif %}
+</div>
+
+<!-- Filters -->
+<section class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
+    <form method="GET" action="{% url 'test_list' %}" id="filter-form" class="flex"
+        style="gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 150px;">
+            <label for="year" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Year" %}</label>
+            <select name="year" id="year" class="form-input" style="width: 100%;">
+                <option value="">{% trans "All Years" %}</option>
+                {% with current_year=filters.year|add:0 %}
+                {% for val, label in year_choices %}
+                <option value="{{ val }}" {% if current_year == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label for="stream" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Stream" %}</label>
+            <select name="stream" id="stream" class="form-input" style="width: 100%;">
+                <option value="">{% trans "All Streams" %}</option>
+                {% with current_stream=filters.stream %}
+                {% for val, label in stream_choices %}
+                <option value="{{ val }}" {% if current_stream == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label for="subject" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Subject" %}</label>
+            <select name="subject" id="subject" class="form-input" style="width: 100%;">
+                <option value="">{% trans "All Subjects" %}</option>
+                {% with current_subject=filters.subject %}
+                {% for val, label in subject_choices %}
+                <option value="{{ val }}" {% if current_subject == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div class="flex" style="gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+            <a href="{% url 'test_list' %}" class="btn btn-secondary">{% trans "Clear" %}</a>
+        </div>
+    </form>
+</section>
+
+{{ subject_choices|json_script:"subject-choices-data" }}
+{{ stream_choices|json_script:"stream-choices-data" }}
+
+<script>
+    const streamChoices = JSON.parse(document.getElementById('stream-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const streamToSubjects = {
+        'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'common_literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'math': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'languages': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'german', 'spanish', 'philosophy'],
+        'literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'philosophy'],
+        'management_economics': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'accounting', 'law', 'economy'],
+        'civil_engineering': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'civil_eng']
+    };
+
+    const subjectChoices = JSON.parse(document.getElementById('subject-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const yearSelect = document.getElementById('year');
+    const streamSelect = document.getElementById('stream');
+    const subjectSelect = document.getElementById('subject');
+
+    function updateStreams() {
+        const year = yearSelect.value;
+        const currentStream = streamSelect.value;
+        const allStreamsText = "{% trans 'All Streams' %}";
+
+        streamSelect.innerHTML = `<option value="">${allStreamsText}</option>`;
+
+        let validStreams = [];
+        if (year == '1') {
+            validStreams = ['common_science', 'common_literature'];
+        } else if (year == '2' || year == '3') {
+            validStreams = ['math', 'science', 'languages', 'literature', 'management_economics', 'civil_engineering'];
+        } else {
+            validStreams = Object.keys(streamChoices);
+        }
+
+        validStreams.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = streamChoices[s];
+            if (s === currentStream) option.selected = true;
+            streamSelect.appendChild(option);
+        });
+
+        updateSubjects();
+    }
+
+    function updateSubjects() {
+        const year = yearSelect.value;
+        const stream = streamSelect.value;
+        const currentSubject = subjectSelect.value;
+
+        let validSubjects = stream ? [...streamToSubjects[stream]] : Object.keys(subjectChoices);
+
+        if (year == '2') {
+            if (stream && stream !== 'languages' && stream !== 'literature') {
+                validSubjects = validSubjects.filter(s => s !== 'philosophy');
+            }
+        } else if (year == '1') {
+            validSubjects = validSubjects.filter(s => s !== 'philosophy');
+        } else if (year == '3') {
+            if (stream && !validSubjects.includes('philosophy')) {
+                validSubjects.push('philosophy');
+            }
+        }
+
+        const allSubjectsText = "{% trans 'All Subjects' %}";
+        subjectSelect.innerHTML = `<option value="">${allSubjectsText}</option>`;
+        validSubjects.forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub;
+            option.textContent = subjectChoices[sub];
+            if (sub === currentSubject) option.selected = true;
+            subjectSelect.appendChild(option);
+        });
+    }
+
+    if (yearSelect) yearSelect.addEventListener('change', updateStreams);
+    if (streamSelect) streamSelect.addEventListener('change', updateSubjects);
+
+    if (yearSelect.value) updateStreams();
+    else if (streamSelect.value) updateSubjects();
+</script>
+
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    {% for test in tests %}
+    <article class="card">
+        <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
+            {% if test.year %}<span class="badge badge-year">{% trans "Year" %} {{ test.year }}</span>{% endif %}
+            {% if test.stream %}<span class="badge badge-stream">{{ test.get_stream_display }}</span>{% endif %}
+            {% if test.subject %}<span class="badge badge-subject">{{ test.get_subject_display }}</span>{% endif %}
+        </div>
+        <h3>{{ test.title }}</h3>
+        <p class="text-muted">{{ test.description|truncatewords:30 }}</p>
+        <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+            {% with author=test.author %}
+            <small class="text-muted">{% trans "Author:" %} {{ author.display_name }}</small>
+            {% endwith %}
+            <div class="flex" style="gap: 0.5rem;">
+                <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary btn-sm">{% trans "Take Test" %}</a>
+                {% if user.is_staff or user == test.author %}
+                {% trans "Delete this test?" as del_msg %} <a href="{% url 'test_delete' pk=test.pk %}"
+                    class="btn btn-secondary btn-sm"
+                    style="color: var(--danger); border-color: var(--danger); padding: 0.25rem 0.5rem;"
+                    onclick="return confirm('{{ del_msg|escapejs }}');"> <svg xmlns="http://www.w3.org/2000/svg"
+                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg> </a> {% endif %}
+            </div>
+        </div>
+    </article> {% empty %} <div class="card text-center" style="padding: 4rem;">
+        <p class="text-muted">{% trans "No tests available." %}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

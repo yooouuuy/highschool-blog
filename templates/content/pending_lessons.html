@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<h1 class="mb-4">{% trans "Pending Content" %}</h1>
+
+<section class="mb-5">
+    <h2 class="mb-3">{% trans "Pending Lessons" %}</h2>
+    <div class="card">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                        <th style="padding: 1rem;">{% trans "Title" %}</th>
+                        <th style="padding: 1rem;">{% trans "Author" %}</th>
+                        <th style="padding: 1rem;">{% trans "Created At" %}</th>
+                        <th style="padding: 1rem;">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lesson in lessons %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem; font-weight: 500;">
+                            <a href="{% url 'lesson_detail' pk=lesson.pk %}">{{ lesson.title }}</a>
+                            <div style="margin-top: 0.25rem;">
+                                {% if lesson.year %}<span class="badge badge-year"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{% trans "Year" %} {{ lesson.year }}</span>{% endif %}
+                                {% if lesson.stream %}<span class="badge badge-stream"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ lesson.get_stream_display }}</span>{% endif %}
+                                {% if lesson.subject %}<span class="badge badge-subject"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ lesson.get_subject_display }}</span>{% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 1rem;">{% with author=lesson.author %}{{ author.display_name }}{% endwith %}</td>
+                        <td style="padding: 1rem; color: var(--text-muted);">{{ lesson.created_at|date:"M j, Y" }}</td>
+                        <td style="padding: 1rem;">
+                            <a href="{% url 'approve_lesson' pk=lesson.pk %}" class="btn btn-primary"
+                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">{% trans "Approve" %}</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                            {% trans "No pending lessons." %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="mb-5">
+    <h2 class="mb-3">{% trans "Pending Tests" %}</h2>
+    <div class="card">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                        <th style="padding: 1rem;">{% trans "Title" %}</th>
+                        <th style="padding: 1rem;">{% trans "Author" %}</th>
+                        <th style="padding: 1rem;">{% trans "Created At" %}</th>
+                        <th style="padding: 1rem;">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test in tests %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem; font-weight: 500;">
+                            <a href="{% url 'test_detail' pk=test.pk %}">{{ test.title }}</a>
+                            <div style="margin-top: 0.25rem;">
+                                {% if test.year %}<span class="badge badge-year"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{% trans "Year" %} {{ test.year }}</span>{% endif %}
+                                {% if test.stream %}<span class="badge badge-stream"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ test.get_stream_display }}</span>{% endif %}
+                                {% if test.subject %}<span class="badge badge-subject"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ test.get_subject_display }}</span>{% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 1rem;">{% with author=test.author %}{{ author.display_name }}{% endwith %}</td>
+                        <td style="padding: 1rem; color: var(--text-muted);">{{ test.created_at|date:"M j, Y" }}</td>
+                        <td style="padding: 1rem;">
+                            <a href="{% url 'approve_test' pk=test.pk %}" class="btn btn-primary"
+                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">{% trans "Approve" %}</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                            {% trans "No pending tests." %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="mt-5">
+    <h2 class="mb-3">{% trans "Pending Resources" %}</h2>
+    <div class="card">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                        <th style="padding: 1rem;">{% trans "Title" %}</th>
+                        <th style="padding: 1rem;">{% trans "Type" %}</th>
+                        <th style="padding: 1rem;">{% trans "Author" %}</th>
+                        <th style="padding: 1rem;">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for resource in resources %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem; font-weight: 500;">
+                            {% if resource.type == 'pdf' and resource.file %}
+                            <a href="{{ resource.file.url }}" target="_blank">{{ resource.title }}</a>
+                            {% else %}
+                            <a href="{{ resource.url }}" target="_blank">{{ resource.title }}</a>
+                            {% endif %}
+                            <div style="margin-top: 0.25rem;">
+                                {% if resource.year %}<span class="badge badge-year"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{% trans "Year" %} {{ resource.year }}</span>{% endif %}
+                                {% if resource.stream %}<span class="badge badge-stream"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ resource.get_stream_display }}</span>{% endif %}
+                                {% if resource.subject %}<span class="badge badge-subject"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">{{ resource.get_subject_display }}</span>{% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 1rem;">{{ resource.get_type_display }}</td>
+                        <td style="padding: 1rem;">{% with author=resource.author %}{{ author.display_name }}{% endwith %}</td>
+                        <td style="padding: 1rem;">
+                            <a href="{% url 'approve_resource' pk=resource.pk %}" class="btn btn-primary"
+                                style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">{% trans "Approve" %}</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 2rem; color: var(--text-muted);">
+                            {% trans "No pending resources." %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

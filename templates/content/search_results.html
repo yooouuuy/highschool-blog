@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Search Results" %} - Zin Highschool{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h1>{% trans "Search Results" %}</h1>
+    <p>{% trans "Results for" %} "{{ query }}"</p>
+</div>
+
+<div class="search-results">
+    {% if not lessons and not tests and not resources %}
+    <div class="empty-state">
+        <p>{% trans "No results found for your query." %}</p>
+    </div>
+    {% else %}
+
+    {% if lessons %}
+    <section class="mb-4">
+        <h2 class="section-title">{% trans "Lessons" %}</h2>
+        <div class="grid">
+            {% for lesson in lessons %}
+            <article class="card">
+                <div class="card-header">
+                    <h3>{{ lesson.title }}</h3>
+                    <span class="badge badge-primary">{{ lesson.get_subject_display }}</span>
+                </div>
+                <div class="card-body">
+                    <p>{{ lesson.content|striptags|truncatewords:20 }}</p>
+                    <div class="meta-info">
+                        <span>{% trans "By" %} {{ lesson.author.display_name }}</span>
+                        <span>{{ lesson.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'lesson_detail' lesson.pk %}" class="btn btn-primary btn-sm">{% trans "Read More" %}</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if tests %}
+    <section class="mb-4">
+        <h2 class="section-title">{% trans "Tests" %}</h2>
+        <div class="grid">
+            {% for test in tests %}
+            <article class="card">
+                <div class="card-header">
+                    <h3>{{ test.title }}</h3>
+                    <span class="badge badge-secondary">{{ test.get_subject_display }}</span>
+                </div>
+                <div class="card-body">
+                    <p>{{ test.description|truncatewords:20 }}</p>
+                    <div class="meta-info">
+                        <span>{% trans "By" %} {{ test.author.display_name }}</span>
+                        <span>{{ test.questions.count }} {% trans "Questions" %}</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'test_detail' test.pk %}" class="btn btn-primary btn-sm">{% trans "View Test" %}</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if resources %}
+    <section class="mb-4">
+        <h2 class="section-title">{% trans "Library Resources" %}</h2>
+        <div class="grid">
+            {% for resource in resources %}
+            <article class="card">
+                <div class="card-header">
+                    <h3>{{ resource.title }}</h3>
+                    <div class="badges">
+                        <span class="badge badge-outline">{{ resource.get_subject_display }}</span>
+                        <span
+                            class="badge {% if resource.type == 'pdf' %}badge-primary{% elif resource.type == 'video' %}badge-secondary{% else %}badge-outline{% endif %}">
+                            {{ resource.get_type_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="meta-info">
+                        <span>{% trans "By" %} {{ resource.author.display_name }}</span>
+                        <span>{{ resource.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    {% if resource.file %}
+                    <a href="{{ resource.file.url }}" class="btn btn-primary btn-sm" target="_blank">{% trans "Download" %}</a>
+                    {% elif resource.url %}
+                    <a href="{{ resource.url }}" class="btn btn-primary btn-sm" target="_blank">{% trans "View Link" %}</a>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% endif %}
+</div>
+{% endblock %}

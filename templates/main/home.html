@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load i18n %}
+<div class="hero fade-in">
+    <h1>{% trans "Welcome to Mohammed El Zin Highschool" %}</h1>
+    <p>{% trans "Your platform for interactive learning and assessment. Explore lessons and take tests to improve your knowledge." %}</p>
+</div>
+
+<div class="grid home-grid" style="grid-template-columns: 2fr 1fr;">
+    <!-- Left Column: News and Lessons -->
+    <div>
+        <section class="mb-5">
+            <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>{% trans "Recent Lessons" %}</h2>
+                <a href="{% url 'lesson_list' %}" class="btn btn-secondary btn-sm">{% trans "View All" %}</a>
+            </div>
+
+            <div class="grid grid-cols-1">
+                {% for lesson in lessons %}
+                <article class="card">
+                    <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
+                        {% if lesson.year %}
+                        <span class="badge badge-year">Year {{ lesson.year }}</span>
+                        {% endif %}
+                        {% if lesson.subject %}
+                        <span class="badge badge-subject">{{ lesson.get_subject_display }}</span>
+                        {% endif %}
+                    </div>
+                    {% with l_title=lesson.title %}
+                    <h3>{{ l_title }}</h3>
+                    {% endwith %}
+                    <p class="text-muted">{{ lesson.content|truncatewords:30 }}</p>
+                    <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+                        {% with l_author=lesson.author %}
+                        <small class="text-muted">{% trans "Author:" %} {{ l_author.display_name }}</small>
+                        {% endwith %}
+                        <a href="{% url 'lesson_detail' pk=lesson.pk %}" class="btn btn-primary btn-sm">{% trans "Read more" %}</a>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="card text-center" style="padding: 2rem; background: var(--background);">
+                    <p class="text-muted">{% trans "No lessons available." %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section>
+            <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>{% trans "Recent Tests" %}</h2>
+                <a href="{% url 'test_list' %}" class="btn btn-secondary btn-sm">{% trans "View All" %}</a>
+            </div>
+
+            <div class="grid grid-cols-1">
+                {% for test in tests %}
+                <article class="card">
+                    <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
+                        {% if test.year %}
+                        <span class="badge badge-year">Year {{ test.year }}</span>
+                        {% endif %}
+                        {% if test.subject %}
+                        <span class="badge badge-subject">{{ test.get_subject_display }}</span>
+                        {% endif %}
+                    </div>
+                    {% with t_title=test.title %}
+                    <h3>{{ t_title }}</h3>
+                    {% endwith %}
+                    <p class="text-muted">{{ test.description|truncatewords:30 }}</p>
+                    <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+                        {% with t_author=test.author %}
+                        <small class="text-muted">{% trans "Author:" %} {{ t_author.display_name }}</small>
+                        {% endwith %}
+                        <a href="{% url 'take_test' pk=test.pk %}" class="btn btn-primary btn-sm">{% trans "Take Test"
+                            %}</a>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="card text-center" style="padding: 2rem; background: var(--background);">
+                    <p class="text-muted">{% trans "No tests are available at the moment." %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="mt-5 mb-4">
+            <h2 class="mb-4">{% trans "School Announcements" %}</h2>
+            <div class="grid grid-cols-1">
+                {% for announcement in announcements %}
+                <div class="card announcement-card">
+                    <div class="flex" style="justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h3>{{ announcement.title }}</h3>
+                            <small class="text-muted" style="display: block; margin-bottom: 0.5rem;">
+                                {{ announcement.created_at|date:"F j, Y - g:i A" }}
+                            </small>
+                            <p>{{ announcement.content|linebreaks }}</p>
+                        </div>
+                        {% if user.is_staff or user == announcement.author %}
+                        {% trans "Delete this announcement?" as del_ann_msg %} <a
+                            href="{% url 'delete_announcement' pk=announcement.pk %}" class="btn btn-secondary btn-sm"
+                            onclick="return confirm('{{ del_ann_msg|escapejs }}');">{% trans "Delete" %}</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="card text-center" style="padding: 2rem; background: var(--background);">
+                    <p class="text-muted">{% trans "No announcements are available at the moment." %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Right Column: Chat Section -->
+    <aside>
+        {% if user.is_authenticated %}
+        {% if year and stream %}
+        <div class="chat-container home-chat">
+            <div class="chat-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3>{% trans "Class Chat" %}</h3>
+                    <p>{{ year_display }} - {{ stream_display }}</p>
+                </div>
+                {% trans "Clear my chat history" as clear_history_title %} <button id="clear-chat-btn"
+                    class="btn btn-sm btn-outline-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;"
+                    title="{{ clear_history_title }}"> {% trans "Clear" %}
+                </button>
+            </div>
+
+            <div id="chat-messages" class="chat-messages">
+                <div class="text-center" style="margin-top: 2rem;">
+                    <p class="text-muted">{% trans "Loading chat..." %}</p>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <form id="chat-form" class="flex" style="gap: 0.5rem;">
+                    {% csrf_token %}
+                    <input type="text" id="message-input" name="message" placeholder="{% trans 'Message...' %}"
+                        class="form-input rounded-pill" required autocomplete="off">
+                    <button type="submit" class="btn btn-primary btn-round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+            <div class="chat-footer">
+                <a href="{% url 'chat_room' year=year stream=stream %}">{% trans "Open Full Chat" %}</a>
+            </div>
+        </div>
+
+        {% trans "Are you sure you want to clear your chat history? This cannot be undone." as clear_history_confirm %}
+        {% trans "Chat history cleared." as history_cleared_msg %} {% trans "Edit" as edit_label %} {% trans "Delete" as
+        delete_label %} {% trans "Started by" as started_by_prefix %} {% trans "posts" as posts_label %} {% trans
+        "Delete this message?" as delete_msg_confirm %} {% trans "Cancel" as cancel_label %} {% trans "Save" as
+        save_label %} {% trans "Edit failed: " as edit_failed_prefix %} {% trans "Delete failed: " as
+        delete_failed_prefix %} {% trans "No messages yet." as no_messages_msg %} {% trans "Loading chat..." as
+        loading_chat_msg %} {% trans "Access denied. Check your year/stream settings." as access_denied_msg %} {% trans
+        "Failed to load chat." as load_failed_msg %} {% trans "Error sending message. Please try again." as
+        send_error_msg %}
+        <script> (function () {
+                const clearHistoryConfirm = '{{ clear_history_confirm|escapejs }}'; const historyClearedMsg = '{{ history_cleared_msg|escapejs }}'; const editLabel = '{{ edit_label|escapejs }}'; const deleteLabel = '{{ delete_label|escapejs }}'; const cancelLabel = '{{ cancel_label|escapejs }}'; const saveLabel = '{{ save_label|escapejs }}'; const editFailedPrefix = '{{ edit_failed_prefix|escapejs }}'; const deleteMsgConfirm = '{{ delete_msg_confirm|escapejs }}'; const deleteFailedPrefix = '{{ delete_failed_prefix|escapejs }}'; const accessDeniedMsg = '{{ access_denied_msg|escapejs }}'; const loadFailedMsg = '{{ load_failed_msg|escapejs }}'; const noMessagesMsg = '{{ no_messages_msg|escapejs }}'; const sendErrorMsg = '{{ send_error_msg|escapejs }}'; const chatMessages = document.getElementById('chat-messages'); const clearChatBtn = document.getElementById('clear-chat-btn'); const chatForm = document.getElementById('chat-form'); const messageInput = document.getElementById('message-input'); let lastMessageId = null; if (clearChatBtn) {
+                    clearChatBtn.addEventListener('click', async () => {
+                        if (!confirm(clearHistoryConfirm)) return; try {
+                            const response = await fetch('{% url "clear_chat_history" %}', {
+                                method: 'POST',
+                                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                            });
+                            const data = await response.json();
+                            if (data.success) {
+                                chatMessages.innerHTML = `<p class="text-center" style="color: var(--text-muted); margin-top: 1rem;">${historyClearedMsg}</p>`;
+                                lastMessageId = null;
+                            }
+                        } catch (error) {
+                            console.error('Error clearing chat:', error);
+                        }
+                    });
+                }
+
+                function getCsrfToken() {
+                    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+                }
+
+                function createMessageElement(msg) {
+                    const div = document.createElement('div');
+                    div.className = `message-bubble ${msg.is_mine ? 'mine' : 'others'}`;
+                    div.setAttribute('data-id', msg.id);
+
+                    const canDeleteOthers = "{{ user.is_staff|yesno:'true,false' }}" === "true" || "{{ user.is_teacher|yesno:'true,false' }}" === "true";
+                    let actionsHtml = '';
+                    if (msg.is_mine) {
+                        actionsHtml = `
+                            <div class="message-actions">
+                                <span class="action-btn edit" onclick="handleEdit(${msg.id})">${editLabel}</span>
+                                <span class="action-btn delete" onclick="handleDelete(${msg.id})">${deleteLabel}</span>
+                            </div>
+                        `;
+                    } else if (canDeleteOthers) {
+                        actionsHtml = `
+                            <div class="message-actions">
+                                <span class="action-btn delete" onclick="handleDelete(${msg.id})">${deleteLabel}</span>
+                            </div>
+                        `;
+                    }
+
+                    div.innerHTML = `
+                        ${actionsHtml}
+                        <div class="message-info" style="font-size: 0.7rem;">
+                            <strong>${msg.author}</strong>
+                            <span>${msg.time}</span>
+                        </div>
+                        <div class="message-text" style="font-size: 0.85rem;">${msg.text}</div>
+                    `;
+                    return div;
+                }
+
+                async function handleEdit(id) {
+                    const bubble = document.querySelector(`.message-bubble[data-id="${id}"]`);
+                    const textDiv = bubble.querySelector('.message-text');
+                    const originalText = textDiv.innerText;
+                    textDiv.setAttribute('data-original', originalText);
+                    bubble.querySelector('.message-actions').style.display = 'none';
+                    textDiv.innerHTML = `
+                        <div class="edit-input-area">
+                            <textarea class="edit-input" style="height: 60px;">${originalText}</textarea>
+                            <div class="edit-controls">
+                                <button class="btn btn-sm btn-secondary" style="padding: 2px 5px; font-size: 0.7rem;" onclick="cancelEdit(${id})">${cancelLabel}</button>
+                                <button class="btn btn-sm btn-primary" style="padding: 2px 5px; font-size: 0.7rem;" onclick="saveEdit(${id})">${saveLabel}</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                window.cancelEdit = (id) => {
+                    const bubble = document.querySelector(`.message-bubble[data-id="${id}"]`);
+                    const textDiv = bubble.querySelector('.message-text');
+                    textDiv.innerText = textDiv.getAttribute('data-original');
+                    bubble.querySelector('.message-actions').style.display = '';
+                }
+
+                window.saveEdit = async (id) => {
+                    const bubble = document.querySelector(`.message-bubble[data-id="${id}"]`);
+                    const newText = bubble.querySelector('.edit-input').value.trim();
+                    if (!newText) return;
+                    const formData = new FormData();
+                    formData.append('message', newText);
+                    formData.append('csrfmiddlewaretoken', getCsrfToken());
+                    try {
+                        const response = await fetch(`/content/chat/message/edit/${id}/`, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() },
+                            body: formData
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            bubble.querySelector('.message-text').innerText = data.text;
+                            bubble.querySelector('.message-actions').style.display = '';
+                        } else {
+                            alert(editFailedPrefix + (data.error || 'Unknown error'));
+                        }
+                    } catch (error) { console.error(error); }
+                }
+
+                window.handleDelete = async (id) => {
+                    if (!confirm(deleteMsgConfirm)) return;
+                    try {
+                        const response = await fetch(`/content/chat/message/delete/${id}/`, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() }
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            document.querySelector(`.message-bubble[data-id="${id}"]`).remove();
+                        } else {
+                            alert(deleteFailedPrefix + (data.error || 'Unknown error'));
+                        }
+                    } catch (error) { console.error(error); }
+                }
+
+                window.handleEdit = handleEdit;
+
+                async function fetchMessages() {
+                    try {
+                        const url = `{% url 'get_messages' year=year stream=stream %}?last_id=${lastMessageId || ''}`;
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            if (response.status === 403) throw new Error(accessDeniedMsg);
+                            throw new Error(loadFailedMsg);
+                        }
+                        const data = await response.json();
+                        if (data.success && data.messages.length > 0) {
+                            if (lastMessageId === null) chatMessages.innerHTML = '';
+                            data.messages.forEach(msg => {
+                                chatMessages.appendChild(createMessageElement(msg));
+                                lastMessageId = msg.id;
+                            });
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        } else if (lastMessageId === null && data.messages.length === 0) {
+                            chatMessages.innerHTML = `<p class="text-center text-muted" style="margin-top:2rem;">${noMessagesMsg}</p>`;
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        if (lastMessageId === null) {
+                            chatMessages.innerHTML = `<p class="text-center text-danger" style="margin-top:2rem;">${error.message}</p>`;
+                        }
+                    }
+                }
+
+                chatForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const message = messageInput.value.trim();
+                    if (!message) return;
+                    const formData = new FormData();
+                    formData.append('message', message);
+                    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                    messageInput.value = '';
+                    try {
+                        const response = await fetch('{% url "send_message" year=year stream=stream %}', {
+                            method: 'POST',
+                            body: formData,
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        if (!response.ok) throw new Error('Failed to send');
+                        const data = await response.json();
+                        if (data.success) fetchMessages();
+                    } catch (error) { alert(sendErrorMsg); }
+                });
+                fetchMessages();
+                setInterval(fetchMessages, 3000);
+            })();
+        </script>
+        {% endif %}
+        {% else %}
+        <div class="card text-center" style="padding: 2rem;">
+            <p class="text-muted">{% trans "Please login as a student to participate in your class chat." %}</p>
+        </div>
+        {% endif %}
+    </aside>
+</div>
+{% endblock %}

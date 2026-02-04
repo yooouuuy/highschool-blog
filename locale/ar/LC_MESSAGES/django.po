@@ -1,0 +1,922 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-27 16:00+0000\n"
+"PO-Revision-Date: 2026-01-27 16:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+msgid "Mohammed El Zin Highschool"
+msgstr "ثانوية محمد الزين"
+
+msgid "Search..."
+msgstr "بحث..."
+
+msgid "Home"
+msgstr "الرئيسية"
+
+msgid "Forums"
+msgstr "المنتديات"
+
+msgid "Library"
+msgstr "المكتبة"
+
+msgid "Lessons"
+msgstr "الدروس"
+
+msgid "Tests"
+msgstr "الاختبارات"
+
+msgid "Chat"
+msgstr "الدردشة"
+
+msgid "Pending Users"
+msgstr "المستخدمون المعلقون"
+
+msgid "Pending Lessons"
+msgstr "الدروس المعلقة"
+
+msgid "New Announcement"
+msgstr "إعلان جديد"
+
+msgid "Teacher"
+msgstr "معلم"
+
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+msgid "Student"
+msgstr "طالب"
+
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+msgid "Register"
+msgstr "تسجيل"
+
+msgid "Switch Language"
+msgstr "تغيير اللغة"
+
+msgid "Mohammed El Zin Highschool. All rights reserved."
+msgstr "ثانوية محمد الزين. جميع الحقوق محفوظة."
+
+msgid "Please"
+msgstr "الرجاء"
+
+msgid "as a student to participate in your class chat."
+msgstr "كطالب للمشاركة في محادثة صفك."
+
+msgid "Test"
+msgstr "اختبار"
+
+msgid "available"
+msgstr "متاح"
+
+msgid "Create New Test"
+msgstr "إنشاء اختبار جديد"
+
+msgid "Year"
+msgstr "السنة"
+
+msgid "All Years"
+msgstr "كل السنوات"
+
+msgid "Stream"
+msgstr "الشعبة"
+
+msgid "All Streams"
+msgstr "كل الشعب"
+
+msgid "Subject"
+msgstr "المادة"
+
+msgid "All Subjects"
+msgstr "كل المواد"
+
+msgid "Filter"
+msgstr "تصفية"
+
+msgid "Clear"
+msgstr "مسح"
+
+msgid "Author:"
+msgstr "المؤلف:"
+
+msgid "Take Test"
+msgstr "بدء الاختبار"
+
+msgid "Delete this test?"
+msgstr "حذف هذا الاختبار؟"
+
+msgid "Delete Test"
+msgstr "حذف الاختبار"
+
+msgid "No tests available."
+msgstr "لا توجد اختبارات متاحة."
+
+msgid "Attached PDF Document"
+msgstr "ملف PDF مرفق"
+
+msgid "Download PDF"
+msgstr "تحميل PDF"
+
+msgid "Created by:"
+msgstr "تم الإنشاء بواسطة:"
+
+msgid "Take Test (Preview)"
+msgstr "بدء الاختبار (معاينة)"
+
+msgid "Take Test Now"
+msgstr "بدء الاختبار الآن"
+
+msgid "Question"
+msgstr "سؤال"
+
+msgid "Add Question"
+msgstr "إضافة سؤال"
+
+msgid "Analytics"
+msgstr "تحليلات"
+
+msgid "No questions have been added yet."
+msgstr "لم تتم إضافة أي أسئلة بعد."
+
+msgid "Add First Question"
+msgstr "أضف السؤال الأول"
+
+msgid "Back to Tests"
+msgstr "العودة للاختبارات"
+
+msgid "Are you sure you want to delete this test?"
+msgstr "هل أنت متأكد أنك تريد حذف هذا الاختبار؟"
+
+msgid "Delete this lesson?"
+msgstr "حذف هذا الدرس؟"
+
+msgid "Are you sure you want to delete this lesson?"
+msgstr "هل أنت متأكد أنك تريد حذف هذا الدرس؟"
+
+msgid "Resource Library"
+msgstr "مكتبة الموارد"
+
+msgid "Resource"
+msgstr "مورد"
+
+msgid "available for download"
+msgstr "متاح للتحميل"
+
+msgid "Upload Resource"
+msgstr "رفع مورد"
+
+msgid "Type"
+msgstr "النوع"
+
+msgid "All Types"
+msgstr "كل الأنواع"
+
+msgid "By:"
+msgstr "بواسطة:"
+
+msgid "Download"
+msgstr "تحميل"
+
+msgid "Watch"
+msgstr "مشاهدة"
+
+msgid "Open Link"
+msgstr "فتح الرابط"
+
+msgid "Delete this resource?"
+msgstr "حذف هذا المورد؟"
+
+msgid "No resources found matching your criteria."
+msgstr "لم يتم العثور على موارد تطابق معاييرك."
+
+msgid "Profile"
+msgstr "الملف الشخصي"
+
+msgid "Staff"
+msgstr "طاقم العمل"
+
+msgid "Contributions"
+msgstr "المساهمات"
+
+msgid "Resources"
+msgstr "الموارد"
+
+msgid "No lessons uploaded yet."
+msgstr "لم يتم رفع أي دروس بعد."
+
+msgid "No tests created yet."
+msgstr "لم يتم إنشاء أي اختبارات بعد."
+
+msgid "No resources shared yet."
+msgstr "لم يتم مشاركة أي موارد بعد."
+
+msgid "Test in Progress"
+msgstr "اختبار قيد التقدم"
+
+msgid "Submit Test Answers"
+msgstr "إرسال إجابات الاختبار"
+
+msgid "Abandon Test"
+msgstr "تخطي الاختبار"
+
+msgid ""
+"Are you sure you want to abandon this test? Your answers will not be saved."
+msgstr "هل أنت متأكد أنك تريد مغادرة الاختبار؟ لن يتم حفظ إجاباتك."
+
+msgid "Student Dashboard"
+msgstr "لوحة تحكم الطالب"
+
+msgid "My Test Results"
+msgstr "نتائج اختباراتي"
+
+msgid "Score"
+msgstr "النتيجة"
+
+msgid "Date Taken"
+msgstr "تاريخ الاختبار"
+
+msgid "Actions"
+msgstr "إجراءات"
+
+msgid "View Details"
+msgstr "عرض التفاصيل"
+
+msgid "No results found."
+msgstr "لا توجد نتائج."
+
+msgid "Take a test now!"
+msgstr "ابدأ اختباراً الآن!"
+
+msgid "My Pending Contributions"
+msgstr "مساهماتي المعلقة"
+
+msgid "These items are waiting to be reviewed and approved by a teacher."
+msgstr "هذه العناصر في انتظار المراجعة والموافقة من قبل معلم."
+
+msgid "Pending Review"
+msgstr "قيد المراجعة"
+
+msgid "You don't have any pending contributions at the moment."
+msgstr "ليس لديك أي مساهمات معلقة حالياً."
+
+msgid "Pending Content"
+msgstr "محتوى معلق"
+
+msgid "Pending Tests"
+msgstr "اختبارات معلقة"
+
+msgid "Pending Resources"
+msgstr "موارد معلقة"
+
+msgid "Title"
+msgstr "العنوان"
+
+msgid "Created At"
+msgstr "تاريخ الإنشاء"
+
+msgid "Approve"
+msgstr "موافقة"
+
+msgid "No pending lessons."
+msgstr "لا توجد دروس معلقة."
+
+msgid "No pending tests."
+msgstr "لا توجد اختبارات معلقة."
+
+msgid "No pending resources."
+msgstr "لا توجد موارد معلقة."
+
+msgid "Join Our Community"
+msgstr "انضم إلى مجتمعنا"
+
+msgid "Create your account to access lessons, tests, and class chats."
+msgstr "أنشئ حسابك للوصول إلى الدروس والاختبارات ومحادثات الفصل."
+
+msgid "I am joining as a:"
+msgstr "سأنضم كـ:"
+
+msgid "Please select either Teacher or Student."
+msgstr "يرجى اختيار إما معلم أو طالب."
+
+msgid "Academic Info"
+msgstr "المعلومات الأكاديمية"
+
+msgid "Validation Errors:"
+msgstr "أخطاء التحقق:"
+
+msgid "Read more"
+msgstr "اقرأ المزيد"
+
+msgid "ago"
+msgstr "منذ"
+
+msgid "Lesson"
+msgstr "درس"
+
+msgid "Account Details"
+msgstr "تفاصيل الحساب"
+
+msgid "Nickname (Display Name)"
+msgstr "اللقب (اسم العرض)"
+
+msgid "How others will see you"
+msgstr "كيف سيراك الآخرون"
+
+msgid "Username"
+msgstr "اسم المستخدم"
+
+msgid "Choose a username"
+msgstr "اختر اسم مستخدم"
+
+msgid "Email Address"
+msgstr "البريد الإلكتروني"
+
+msgid "Personal Profile"
+msgstr "الملف الشخصي"
+
+msgid "Full Real Name"
+msgstr "الاسم الحقيقي الكامل"
+
+msgid "As per official documents"
+msgstr "كما هو في المستندات الرسمية"
+
+msgid "Bio (optional)"
+msgstr "نبذة (اختياري)"
+
+msgid "Profile Picture (optional)"
+msgstr "صورة الملف الشخصي (اختياري)"
+
+msgid "Year Level"
+msgstr "المستوى الدراسي"
+
+msgid "Security"
+msgstr "الأمان"
+
+msgid "Password"
+msgstr "كلمة المرور"
+
+msgid "Min. 8 characters"
+msgstr "8 أحرف على الأقل"
+
+msgid "Confirm Password"
+msgstr "تأكيد كلمة المرور"
+
+msgid "Repeat password"
+msgstr "كرر كلمة المرور"
+
+msgid "Register Account"
+msgstr "تسجيل الحساب"
+
+msgid "Already registered?"
+msgstr "مسجل بالفعل؟"
+
+msgid "Log In Here"
+msgstr "سجل الدخول هنا"
+
+msgid "1st Year"
+msgstr "السنة الأولى"
+
+msgid "2nd Year"
+msgstr "السنة الثانية"
+
+msgid "3rd Year"
+msgstr "السنة الثالثة"
+
+msgid "Common Science"
+msgstr "جذع مشترك علوم"
+
+msgid "Common Literature"
+msgstr "جذع مشترك آداب"
+
+msgid "Math Stream"
+msgstr "شعبة الرياضيات"
+
+msgid "Science Stream"
+msgstr "شعبة العلوم التجريبية"
+
+msgid "Languages Stream"
+msgstr "شعبة اللغات الأجنبية"
+
+msgid "Literature Stream"
+msgstr "شعبة الآداب والفلسفة"
+
+msgid "Management & Economics Stream"
+msgstr "شعبة تسيير واقتصاد"
+
+msgid "Civil Engineering Stream"
+msgstr "شعبة هندسة مدنية"
+
+msgid "Mathematics"
+msgstr "الرياضيات"
+
+msgid "Physics"
+msgstr "الفيزياء"
+
+msgid "SVT (Science)"
+msgstr "علوم الطبيعة والحياة"
+
+msgid "Arabic"
+msgstr "اللغة العربية"
+
+msgid "French"
+msgstr "اللغة الفرنسية"
+
+msgid "English"
+msgstr "اللغة الإنجليزية"
+
+msgid "Islamic Studies"
+msgstr "العلوم الإسلامية"
+
+msgid "History & Geography"
+msgstr "التاريخ والجغرافيا"
+
+msgid "Philosophy"
+msgstr "الفلسفة"
+
+msgid "Physical Education"
+msgstr "التربية البدنية"
+
+msgid "Test Results"
+msgstr "نتائج الاختبار"
+
+msgid "Average Correct Answers"
+msgstr "متوسط الإجابات الصحيحة"
+
+msgid "Average Incorrect Answers"
+msgstr "متوسط الإجابات الخاطئة"
+
+msgid "Overall Performance"
+msgstr "الأداء العام"
+
+msgid "Question Performance"
+msgstr "أداء الأسئلة"
+
+msgid "Correct %"
+msgstr "نسبة الصحة %"
+
+msgid "Attempts"
+msgstr "المحاولات"
+
+msgid "Correct Answers"
+msgstr "إجابات صحيحة"
+
+msgid "Incorrect Answers"
+msgstr "إجابات خاطئة"
+
+msgid "Total Questions"
+msgstr "إجمالي الأسئلة"
+
+msgid "Your Score"
+msgstr "درجتك"
+
+msgid "Back to Test List"
+msgstr "العودة لقائمة الاختبارات"
+
+msgid "Create Lesson"
+msgstr "إنشاء درس"
+
+msgid "Save Lesson"
+msgstr "حفظ الدرس"
+
+msgid "Submit for Approval"
+msgstr "إرسال للموافقة"
+
+msgid "PDF File (Optional)"
+msgstr "ملف PDF (اختياري)"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Create Test"
+msgstr "إنشاء اختبار"
+
+msgid "Description"
+msgstr "الوصف"
+
+msgid "Upload New Resource"
+msgstr "رفع مورد جديد"
+
+msgid "Publish Resource"
+msgstr "نشر المورد"
+
+msgid "Start New Discussion"
+msgstr "بدء مناقشة جديدة"
+
+msgid "Discussion Title"
+msgstr "عنوان المناقشة"
+
+msgid "Your Message"
+msgstr "رسالتك"
+
+msgid "What's on your mind?"
+msgstr "ماذا يدور في ذهنك؟"
+
+msgid "Post Discussion"
+msgstr "نشر المناقشة"
+
+msgid "Add Question to:"
+msgstr "إضافة سؤال إلى:"
+
+msgid "Create Announcement"
+msgstr "إنشاء إعلان"
+
+msgid "Post Announcement"
+msgstr "نشر الإعلان"
+
+msgid "Edit Profile"
+msgstr "تعديل الملف الشخصي"
+
+msgid "No Pic"
+msgstr "لا توجد صورة"
+
+msgid "Real Name"
+msgstr "الاسم الحقيقي"
+
+msgid "Real name cannot be changed."
+msgstr "لا يمكن تغيير الاسم الحقيقي."
+
+msgid "Save Changes"
+msgstr "حفظ التغييرات"
+
+msgid "Pending User Approvals"
+msgstr "طلبات الموافقة المعلقة"
+
+msgid "Date Joined"
+msgstr "تاريخ الانضمام"
+
+msgid "Actions"
+msgstr "إجراءات"
+
+msgid "Role"
+msgstr "الدور"
+
+msgid "User"
+msgstr "مستخدم"
+
+msgid "No pending users."
+msgstr "لا يوجد مستخدمون معلقون."
+
+msgid "Registration Successful"
+msgstr "تم التسجيل بنجاح"
+
+msgid ""
+"Thank you for registering at <strong>Mohammed El Zin Highschool</strong>."
+msgstr "شكراً لتسجيلك في <strong>ثانوية محمد الزين</strong>."
+
+msgid "Pending Approval"
+msgstr "في انتظار الموافقة"
+
+msgid ""
+"Your account must be approved by a staff member before you can log in. "
+"Please wait for an administrator to review your details."
+msgstr ""
+"يجب الموافقة على حسابك من قبل أحد الموظفين قبل أن تتمكن من تسجيل الدخول. "
+"يرجى الانتظار حتى يراجع المسؤول تفاصيلك."
+
+msgid "Search Results"
+msgstr "نتائج البحث"
+
+msgid "Results for"
+msgstr "نتائج لـ"
+
+msgid "No results found for your query."
+msgstr "لم يتم العثور على نتائج لبحثك."
+
+msgid "Questions"
+msgstr "أسئلة"
+
+msgid "View Test"
+msgstr "عرض الاختبار"
+
+msgid "View Link"
+msgstr "عرض الرابط"
+
+msgid "Notifications"
+msgstr "التنبيهات"
+
+msgid "New"
+msgstr "جديد"
+
+msgid "Mark Read"
+msgstr "تحديد كمقروء"
+
+msgid "View"
+msgstr "عرض"
+
+msgid "No notifications"
+msgstr "لا توجد تنبيهات"
+
+msgid "You're all caught up!"
+msgstr "أنت مطلع على كل شيء!"
+
+msgid "Option A"
+msgstr "الخيار أ"
+
+msgid "Option B"
+msgstr "الخيار ب"
+
+msgid "Option C"
+msgstr "الخيار ج"
+
+msgid "Option D"
+msgstr "الخيار د"
+
+msgid "PDF Document"
+msgstr "مستند PDF"
+
+msgid "Video Link"
+msgstr "رابط فيديو"
+
+msgid "External Link"
+msgstr "رابط خارجي"
+
+msgid "General Discussion"
+msgstr "مناقشة عامة"
+
+msgid "Resource Share"
+msgstr "مشاركة موارد"
+
+msgid "Correct: Option"
+msgstr "الصحيح: الخيار"
+
+msgid "Ordered by difficulty (lowest accuracy first)"
+msgstr "مرتبة حسب الصعوبة (الأقل دقة أولاً)"
+
+msgid "Highest Score"
+msgstr "أعلى درجة"
+
+msgid "Lowest Score"
+msgstr "أقل درجة"
+
+msgid "Students Taken"
+msgstr "الطلاب الذين خضعوا للاختبار"
+
+msgid "Average Score"
+msgstr "متوسط الدرجات"
+
+msgid "Question Breakdown"
+msgstr "تحليل الأسئلة"
+
+msgid "Analytics:"
+msgstr "التحليلات:"
+
+msgid "Back to Test"
+msgstr "العودة للاختبار"
+
+msgid "No students have taken this test yet."
+msgstr "لم يقم أي طالب بإجراء هذا الاختبار بعد."
+
+msgid "Q:"
+msgstr "س:"
+
+msgid "Your full real name (cannot be changed later)."
+msgstr "اسمك الحقيقي الكامل (لا يمكن تغييره لاحقاً)."
+
+msgid "A display name you can change."
+msgstr "اسم عرض يمكنك تغييره."
+
+msgid "Optional profile picture."
+msgstr "صورة ملف شخصي اختيارية."
+
+msgid "Select your year level (for students only)."
+msgstr "اختر مستواك الدراسي (للطلاب فقط)."
+
+msgid ""
+"Your academic stream (1st: Common Sci/Lit, 2nd/3rd: specialized streams)."
+msgstr ""
+"شعبتك الأكاديمية (السنة الأولى: مشترك ع/آ، الثانية/الثالثة: شعب مختصة)."
+
+msgid "This name will be displayed to others."
+msgstr "سيظهر هذا الاسم للآخرين."
+
+msgid "Tell us a bit about yourself."
+msgstr "أخبرنا قليلاً عن نفسك."
+
+msgid "You must upload a PDF file."
+msgstr "يجب تحميل ملف PDF."
+
+msgid "You must provide a URL."
+msgstr "يجب توفير رابط URL."
+
+msgid "Write your reply..."
+msgstr "اكتب ردك..."
+
+msgid "Ask a question or leave a comment..."
+msgstr "اطرح سؤالاً أو اترك تعليقاً..."
+
+msgid "Clear Chat"
+msgstr "مسح الدردشة"
+
+msgid "Chat Room"
+msgstr "غرفة الدردشة"
+
+msgid "Clear my chat history"
+msgstr "مسح سجل الدردشة الخاص بي"
+
+msgid "Loading messages..."
+msgstr "جاري تحميل الرسائل..."
+
+msgid "Type your message..."
+msgstr "اكتب رسالتك..."
+
+msgid ""
+"Are you sure you want to clear your chat history? This cannot be undone."
+msgstr ""
+"هل أنت متأكد أنك تريد مسح سجل الدردشة؟ لا يمكن التراجع عن هذا الإجراء."
+
+msgid "Chat history cleared."
+msgstr "تم مسح سجل الدردشة."
+
+msgid "Failed to clear chat history."
+msgstr "فشل مسح سجل الدردشة."
+
+msgid "Edit"
+msgstr "تعديل"
+
+msgid "Delete"
+msgstr "حذف"
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Edit failed: "
+msgstr "فشل التعديل: "
+
+msgid "Are you sure you want to delete this message?"
+msgstr "هل أنت متأكد أنك تريد حذف هذه الرسالة؟"
+
+msgid "Delete failed: "
+msgstr "فشل الحذف: "
+
+msgid "No messages yet. Be the first to say something!"
+msgstr "لا توجد رسائل بعد. كن أول من يتحدث!"
+
+msgid "Failed to send message: "
+msgstr "فشل إرسال الرسالة: "
+
+msgid "Error sending message. Please try again."
+msgstr "خطأ في إرسال الرسالة. يرجى المحاولة مرة أخرى."
+
+msgid "Class Chat"
+msgstr "محادثة الفصل"
+
+msgid "Open Full Chat"
+msgstr "فتح الدردشة الكاملة"
+
+msgid "Started by"
+msgstr "بدأ بواسطة"
+
+msgid "Access denied. Check your year/stream settings."
+msgstr "تم رفض الوصول. تحقق من إعدادات السنة/الشعبة الخاصة بك."
+
+msgid "Failed to load chat."
+msgstr "فشل تحميل الدردشة."
+
+msgid "Delete this announcement?"
+msgstr "حذف هذا الإعلان؟"
+
+msgid "School Announcements"
+msgstr "إعلانات المدرسة"
+
+msgid "Recent Lessons"
+msgstr "أحدث الدروس"
+
+msgid "Recent Tests"
+msgstr "أحدث الاختبارات"
+
+msgid "Library Resources"
+msgstr "موارد المكتبة"
+
+msgid "Post a Reply"
+msgstr "أضف رداً"
+
+msgid "Submit Reply"
+msgstr "إرسال الرد"
+
+msgid "Delete Thread"
+msgstr "حذف الموضوع"
+
+msgid "Delete this entire discussion?"
+msgstr "حذف هذه المناقشة بالكامل؟"
+
+msgid "Page Not Found"
+msgstr "الصفحة غير موجودة"
+
+msgid ""
+"The page you are looking for might have been removed, had its name changed, "
+"or is temporarily unavailable."
+msgstr ""
+"الصفحة التي تبحث عنها قد تكون حذفت، تم تغيير اسمها، أو غير متاحة مؤقتاً."
+
+msgid "Back to Home"
+msgstr "العودة للرئيسية"
+
+msgid "Internal Server Error"
+msgstr "خطأ داخلي في الخادم"
+
+msgid ""
+"Something went wrong on our end. We're working on fixing it. Please try "
+"again later."
+msgstr ""
+"حدث خطأ ما من جانبنا. نحن نعمل على إصلاحه. يرجى المحاولة مرة أخرى لاحقاً."
+
+msgid "Subject Forums"
+msgstr "منتديات المواد"
+
+msgid "View Threads"
+msgstr "عرض المواضيع"
+
+msgid "No lessons available."
+msgstr "لا توجد دروس متاحة."
+
+msgid "No tests are available at the moment."
+msgstr "لا توجد اختبارات متاحة في الوقت الحالي."
+
+msgid "No announcements are available at the moment."
+msgstr "لا توجد إعلانات متاحة في الوقت الحالي."
+
+msgid "Welcome Back"
+msgstr "مرحباً بعودتك"
+
+msgid "Please enter your credentials"
+msgstr "يرجى إدخال بيانات الاعتماد الخاصة بك"
+
+msgid "Your username"
+msgstr "اسم المستخدم الخاص بك"
+
+msgid "Your password"
+msgstr "كلمة المرور الخاصة بك"
+
+msgid "Don't have an account?"
+msgstr "ليس لديك حساب؟"
+
+msgid "Create one now"
+msgstr "أنشئ حساباً الآن"
+
+msgid "First Year"
+msgstr "السنة الأولى"
+
+msgid "Second Year"
+msgstr "السنة الثانية"
+
+msgid "Third Year"
+msgstr "السنة الثالثة"
+
+msgid "Civil Engineering"
+msgstr "الهندسة المدنية"
+
+msgid "Accounting"
+msgstr "المحاسبة"
+
+msgid "Law"
+msgstr "القانون"
+
+msgid "Economy"
+msgstr "الاقتصاد"
+
+msgid "German"
+msgstr "اللغة الألمانية"
+
+msgid "Spanish"
+msgstr "اللغة الإسبانية"
+
+msgid "Welcome to Mohammed El Zin Highschool"
+msgstr "مرحباً بكم في ثانوية محمد الزين"
+
+msgid ""
+"Your platform for interactive learning and assessment. Explore lessons and "
+"take tests to improve your knowledge."
+msgstr ""
+"منصتك للتعلم التفاعلي والتقييم. استكشف الدروس وقم بإجراء الاختبارات لتحسين "
+"معارفك."
+
+msgid "View All"
+msgstr "عرض الكل"
+
+msgid "Discussion forum for %(label)s"
+msgstr "منتدى النقاش لـ %(label)s"
+
+msgid "No lessons found."
+msgstr "لم يتم العثور على دروس."
+
+msgid "Science"
+msgstr "العلوم"
+
+msgid "Math"
+msgstr "الرياضيات"
+
+msgid "Create New Lesson"
+msgstr "إنشاء درس جديد"

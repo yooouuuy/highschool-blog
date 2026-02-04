@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% trans "Create Lesson" %}</h1>
+<form method="post" enctype="multipart/form-data" class="card" style="padding: 2rem; max-width: 800px; margin: 0 auto;">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+    <div class="alert alert-error"
+        style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
+        {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <div style="margin-bottom: 1.5rem;">
+        <label for="id_title" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Title" %}</label>
+        {{ form.title }}
+        {% if form.title.errors %}
+        <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{ form.title.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 1.5rem;">
+        <label for="id_content" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Content" %}</label>
+        {{ form.content }}
+        {% if form.content.errors %}
+        <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{ form.content.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 1.5rem;">
+        <label for="id_pdf_file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "PDF File (Optional)" %}</label>
+        {{ form.pdf_file }}
+        {% if form.pdf_file.errors %}
+        <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{ form.pdf_file.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-3" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+        <div>
+            <label for="id_year" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Year" %}</label>
+            {{ form.year }}
+            {% if form.year.errors %}
+            <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{ form.year.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            <label for="id_stream" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Stream" %}</label>
+            {{ form.stream }}
+            {% if form.stream.errors %}
+            <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{ form.stream.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
+            <label for="id_subject" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">{% trans "Subject" %}</label>
+            {{ form.subject }}
+            {% if form.subject.errors %}
+            <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">{{ form.subject.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="text-align: right;">
+        <button type="submit" class="btn btn-primary">
+            {% if user.is_teacher or user.is_staff %}{% trans "Save Lesson" %}{% else %}{% trans "Submit for Approval" %}{% endif %}
+        </button>
+        <a href="{% url 'lesson_list' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+    </div>
+</form>
+
+{{ subject_choices|json_script:"subject-choices-data" }}
+{{ stream_choices|json_script:"stream-choices-data" }}
+
+<script>
+    const streamChoices = JSON.parse(document.getElementById('stream-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const streamToSubjects = {
+        'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'common_literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'math': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'languages': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'german', 'spanish', 'philosophy'],
+        'literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'philosophy'],
+        'management_economics': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'accounting', 'law', 'economy'],
+        'civil_engineering': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'civil_eng']
+    };
+
+    const subjectChoices = JSON.parse(document.getElementById('subject-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const yearSelect = document.getElementById('id_year');
+    const streamSelect = document.getElementById('id_stream');
+    const subjectSelect = document.getElementById('id_subject');
+
+    function updateStreams() {
+        const year = yearSelect.value;
+        const currentStream = streamSelect.value;
+
+        streamSelect.innerHTML = '<option value="">---------</option>';
+
+        let validStreams = [];
+        if (year == '1') {
+            validStreams = ['common_science', 'common_literature'];
+        } else if (year == '2' || year == '3') {
+            validStreams = ['math', 'science', 'languages', 'literature', 'management_economics', 'civil_engineering'];
+        } else {
+            validStreams = Object.keys(streamChoices);
+        }
+
+        validStreams.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = streamChoices[s];
+            if (s === currentStream) option.selected = true;
+            streamSelect.appendChild(option);
+        });
+
+        updateSubjects();
+    }
+
+    function updateSubjects() {
+        const year = yearSelect.value;
+        const stream = streamSelect.value;
+        const currentSubject = subjectSelect.value;
+
+        // Base subjects for the stream
+        let validSubjects = stream ? [...streamToSubjects[stream]] : Object.keys(subjectChoices);
+
+        // Philosophy logic
+        // Year 2: Only Languages & Literature
+        // Year 3: Everyone
+        if (year == '2') {
+            if (stream !== 'languages' && stream !== 'literature') {
+                validSubjects = validSubjects.filter(s => s !== 'philosophy');
+            }
+        } else if (year == '1') {
+            validSubjects = validSubjects.filter(s => s !== 'philosophy');
+        } else if (year == '3') {
+            if (!validSubjects.includes('philosophy')) {
+                validSubjects.push('philosophy');
+            }
+        }
+
+        subjectSelect.innerHTML = '<option value="">---------</option>';
+
+        validSubjects.forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub;
+            option.textContent = subjectChoices[sub];
+            if (sub === currentSubject) option.selected = true;
+            subjectSelect.appendChild(option);
+        });
+    }
+
+    yearSelect.addEventListener('change', updateStreams);
+    streamSelect.addEventListener('change', updateSubjects);
+    updateStreams();
+</script>
+
+<style>
+    .form-input,
+    select,
+    textarea,
+    input[type="text"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background-color: var(--surface);
+        color: var(--text);
+    }
+
+    textarea {
+        min-height: 200px;
+    }
+</style>
+{% endblock %}

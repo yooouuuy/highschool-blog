@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% trans "Dashboard" %}</h1>
+
+{% if user.is_teacher %}
+<h2>{% trans "Your Lessons" %}</h2>
+<a href="#">{% trans "Create New Lesson" %}</a>
+<ul>
+    {% for lesson in user_lessons %}
+    <li>{{ lesson.title }} - <a href="#">{% trans "Edit" %}</a></li>
+    {% empty %}
+    <li>{% trans "No lessons created yet." %}</li>
+    {% endfor %}
+</ul>
+
+<h2>{% trans "Your Tests" %}</h2>
+<a href="#">{% trans "Create New Test" %}</a>
+<ul>
+    {% for test in user_tests %}
+    <li>{{ test.title }} - <a href="#">{% trans "Edit" %}</a></li>
+    {% empty %}
+    <li>{% trans "No tests created yet." %}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if user.is_student %}
+<h2>{% trans "Available Tests" %}</h2>
+<p>{% trans "List of tests to take (TBD)" %}</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+{% load i18n moderation_tags %}
+
+{% block content %}
+<div class="flex" style="justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+    <div>
+        <h1 class="mb-1">{% trans "Resource Library" %}</h1>
+        <p class="text-muted">{{ total_count }} {% trans "Resource" %}{{ total_count|pluralize }} {% trans "available for download" %}</p>
+    </div>
+    {% if user.is_authenticated %}
+    <a href="{% url 'resource_create' %}" class="btn btn-primary">{% trans "Upload Resource" %}</a>
+    {% endif %}
+</div>
+
+<!-- Filters -->
+<section class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
+    <form method="GET" action="{% url 'resource_list' %}" class="flex"
+        style="gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 150px;">
+            <label class="form-label">{% trans "Year" %}</label>
+            <select name="year" id="year" class="form-input">
+                <option value="">{% trans "All Years" %}</option>
+                {% with current_year=filters.year|add:0 %}
+                {% for val, label in year_choices %}
+                <option value="{{ val }}" {% if current_year == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label class="form-label">{% trans "Stream" %}</label>
+            <select name="stream" id="stream" class="form-input">
+                <option value="">{% trans "All Streams" %}</option>
+                {% with current_stream=filters.stream %}
+                {% for val, label in stream_choices %}
+                <option value="{{ val }}" {% if current_stream == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label class="form-label">{% trans "Subject" %}</label>
+            <select name="subject" id="subject" class="form-input">
+                <option value="">{% trans "All Subjects" %}</option>
+                {% with current_subject=filters.subject %}
+                {% for val, label in subject_choices %}
+                <option value="{{ val }}" {% if current_subject == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div style="flex: 1; min-width: 150px;">
+            <label class="form-label">{% trans "Type" %}</label>
+            <select name="type" class="form-input">
+                <option value="">{% trans "All Types" %}</option>
+                {% with current_type=filters.type %}
+                {% for val, label in type_choices %}
+                <option value="{{ val }}" {% if current_type == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </div>
+
+        <div class="flex" style="gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+            <a href="{% url 'resource_list' %}" class="btn btn-secondary">{% trans "Clear" %}</a>
+        </div>
+    </form>
+</section>
+
+{{ subject_choices|json_script:"subject-choices-data" }}
+{{ stream_choices|json_script:"stream-choices-data" }}
+
+<script>
+    const streamChoices = JSON.parse(document.getElementById('stream-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const streamToSubjects = {
+        'common_science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'common_literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'math': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'science': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo'],
+        'languages': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'german', 'spanish', 'philosophy'],
+        'literature': ['math', 'science', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'philosophy'],
+        'management_economics': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'accounting', 'law', 'economy'],
+        'civil_engineering': ['math', 'physics', 'arabic', 'english', 'french', 'hist_geo', 'civil_eng']
+    };
+
+    const subjectChoices = JSON.parse(document.getElementById('subject-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const yearSelect = document.getElementById('year');
+    const streamSelect = document.getElementById('stream');
+    const subjectSelect = document.getElementById('subject');
+
+    function updateStreams() {
+        const year = yearSelect.value;
+        const currentStream = streamSelect.value;
+        const allStreamsText = "{% trans 'All Streams' %}";
+
+        streamSelect.innerHTML = `<option value="">${allStreamsText}</option>`;
+
+        let validStreams = [];
+        if (year == '1') {
+            validStreams = ['common_science', 'common_literature'];
+        } else if (year == '2' || year == '3') {
+            validStreams = ['math', 'science', 'languages', 'literature', 'management_economics', 'civil_engineering'];
+        } else {
+            validStreams = Object.keys(streamChoices);
+        }
+
+        validStreams.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = streamChoices[s];
+            if (s === currentStream) option.selected = true;
+            streamSelect.appendChild(option);
+        });
+
+        updateSubjects();
+    }
+
+    function updateSubjects() {
+        const year = yearSelect.value;
+        const stream = streamSelect.value;
+        const currentSubject = subjectSelect.value;
+
+        let validSubjects = stream ? [...streamToSubjects[stream]] : Object.keys(subjectChoices);
+
+        if (year == '2') {
+            if (stream && stream !== 'languages' && stream !== 'literature') {
+                validSubjects = validSubjects.filter(s => s !== 'philosophy');
+            }
+        } else if (year == '1') {
+            validSubjects = validSubjects.filter(s => s !== 'philosophy');
+        } else if (year == '3') {
+            if (stream && !validSubjects.includes('philosophy')) {
+                validSubjects.push('philosophy');
+            }
+        }
+
+        const allSubjectsText = "{% trans 'All Subjects' %}";
+        subjectSelect.innerHTML = `<option value="">${allSubjectsText}</option>`;
+        validSubjects.forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub;
+            option.textContent = subjectChoices[sub];
+            if (sub === currentSubject) option.selected = true;
+            subjectSelect.appendChild(option);
+        });
+    }
+
+    if (yearSelect) yearSelect.addEventListener('change', updateStreams);
+    if (streamSelect) streamSelect.addEventListener('change', updateSubjects);
+
+    if (yearSelect.value) updateStreams();
+    else if (streamSelect.value) updateSubjects();
+</script>
+
+<div class="grid grid-cols-1" style="gap: 1.5rem;">
+    {% for resource in resources %}
+    <article class="card">
+        <div class="flex mb-2" style="gap: 0.5rem; flex-wrap: wrap;">
+            {% if resource.year %}
+            <span class="badge badge-year">{% trans "Year" %} {{ resource.year }}</span>
+            {% endif %}
+            {% if resource.subject %}
+            <span class="badge badge-subject">{{ resource.get_subject_display }}</span>
+            {% endif %}
+            <span class="badge" style="background: rgba(0,0,0,0.05);">{{ resource.get_type_display }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+            <h3 class="mb-3" style="flex: 1;">{{ resource.title }}</h3>
+            {% if user.is_authenticated and user != resource.author %}
+            <button onclick="openReportModal('{{ resource.id }}', '{% get_content_type_id resource %}')"
+                style="background:none; border:none; padding:0; cursor:pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center;"
+                title="{% trans 'Report Resource' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                    <line x1="4" x2="4" y1="22" y2="15"></line>
+                </svg>
+            </button>
+            {% endif %}
+        </div>
+
+        <div class="flex" style="justify-content: space-between; align-items: center; margin-top: 1rem;">
+            {% with author=resource.author %}
+            <small class="text-muted">{% trans "By:" %} {{ author.display_name }}</small>
+            {% endwith %}
+
+            <div class="flex" style="gap: 0.5rem;">
+                {% if resource.type == 'pdf' and resource.file %}
+                <a href="{{ resource.file.url }}" class="btn btn-primary btn-sm" download>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 0.5rem;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    {% trans "Download" %}
+                </a>
+                {% elif resource.type == 'video' and resource.url %}
+                <a href="{{ resource.url }}" target="_blank" class="btn btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 0.5rem;">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    {% trans "Watch" %}
+                </a>
+                {% elif resource.url %}
+                <a href="{{ resource.url }}" target="_blank" class="btn btn-secondary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 0.5rem;">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    {% trans "Open Link" %}
+                </a>
+                {% endif %}
+                {% if user.is_staff or user.is_teacher %}
+                {% trans "Delete this resource?" as del_msg %} <a href="{% url 'resource_delete' pk=resource.pk %}"
+                    class="btn btn-secondary btn-sm"
+                    style="color: var(--danger); border-color: var(--danger); padding: 0.25rem 0.5rem;"
+                    onclick="return confirm('{{ del_msg|escapejs }}');"> <svg xmlns="http://www.w3.org/2000/svg"
+                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg> </a> {% endif %}
+            </div>
+        </div>
+    </article> {% empty %} <div class="card text-center" style="grid-column: 1 / -1; padding: 4rem;">
+        <p class="text-muted">{% trans "No resources found matching your criteria." %}</p>
+    </div>
+    {% endfor %}
+</div>
+{% include 'moderation/report_modal.html' %}
+{% endblock %}

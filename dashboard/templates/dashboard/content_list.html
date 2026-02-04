@@ -1,0 +1,171 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load i18n %}
+
+{% block dashboard_content %}
+<div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>
+        {% trans "Content Management" %}
+    </h2>
+    <style>
+        .filter-btn-active {
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .filter-btn-inactive {
+            background: transparent;
+            border: none;
+        }
+
+        .filter-group-btn {
+            border-radius: 0;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .simple-btn-active {
+            background: var(--primary);
+            color: white;
+            border: 1px solid var(--primary);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .simple-btn-inactive {
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+        }
+    </style>
+    <div class="filters" style="display: flex; gap: 0.5rem;">
+        <div style="display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;">
+            <a href="?type=lesson&status={{ current_status }}"
+                class="btn filter-group-btn {% if current_type == 'lesson' %}filter-btn-active{% else %}filter-btn-inactive{% endif %}">
+                {% trans "Lessons" %}
+            </a>
+            <a href="?type=test&status={{ current_status }}"
+                class="btn filter-group-btn {% if current_type == 'test' %}filter-btn-active{% else %}filter-btn-inactive{% endif %}"
+                style="border-left: 1px solid var(--border);">
+                {% trans "Tests" %}
+            </a>
+            <a href="?type=resource&status={{ current_status }}"
+                class="btn filter-group-btn {% if current_type == 'resource' %}filter-btn-active{% else %}filter-btn-inactive{% endif %}"
+                style="border-left: 1px solid var(--border);">
+                {% trans "Resources" %}
+            </a>
+        </div>
+
+        <div style="width: 1px; background: var(--border); margin: 0 0.5rem;"></div>
+
+        <a href="?type={{ current_type }}&status=all"
+            class="btn {% if current_status == 'all' %}simple-btn-active{% else %}simple-btn-inactive{% endif %}">
+            {% trans "All" %}
+        </a>
+        <a href="?type={{ current_type }}&status=pending"
+            class="btn {% if current_status == 'pending' %}simple-btn-active{% else %}simple-btn-inactive{% endif %}">
+            {% trans "Pending" %}
+        </a>
+    </div>
+</div>
+
+<div class="card" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+        <thead>
+            <tr style="background: var(--surface-hover); text-align: left;">
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">
+                    {% trans "Title" %}
+                </th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">
+                    {% trans "Author" %}
+                </th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">
+                    {% trans "Year/Stream" %}
+                </th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">
+                    {% trans "Date" %}
+                </th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border);">
+                    {% trans "Status" %}
+                </th>
+                <th style="padding: 1rem; border-bottom: 2px solid var(--border); text-align: right;">
+                    {% trans "Actions" %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in content_items %}
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem;">
+                    <div style="font-weight: 600;">{{ item.title|truncatechars:40 }}</div>
+                </td>
+                <td style="padding: 1rem;">
+                    {{ item.author.username }}
+                </td>
+                <td style="padding: 1rem; font-size: 0.9rem;">
+                    {% if item.year %}Year {{ item.year }}{% endif %}
+                    {% if item.stream %}<br><span style="color: var(--text-muted);">{{ item.stream }}</span>{% endif %}
+                </td>
+                <td style="padding: 1rem; font-size: 0.9rem;">{{ item.created_at|date:"M d, Y" }}</td>
+                <td>
+                    {% if item.is_approved %}
+                    <span style="color: #16a34a;">● {% trans "Approved" %}</span>
+                    {% else %}
+                    <span style="color: #dc2626;">● {% trans "Pending" %}</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem; text-align: right;">
+                    <div style="display: flex; justify-content: flex-end; gap: 0.5rem; align-items: center;">
+                        <form action="{% url 'dashboard:action' %}" method="post"
+                            style="display: inline-flex; gap: 0.5rem; align-items: center;">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                            <input type="hidden" name="item_type" value="{{ current_type }}">
+
+                            {% if not item.is_approved %}
+                            <button type="submit" name="action" value="approve" title="{% trans 'Approve' %}"
+                                style="background: none; border: none; cursor: pointer; color: #16a34a; font-size: 1.2rem;">
+                                ✅
+                            </button>
+                            {% endif %}
+
+                            {% trans "Are you sure you want to delete this item?" as content_delete_msg %} <button
+                                type="submit" name="action" value="reject" title="{% trans 'Delete' %}"
+                                style="background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.2rem;"
+                                data-confirm="{{ content_delete_msg }}"
+                                onclick="return confirm(this.getAttribute('data-confirm'))"> 🗑️ </button>
+                        </form>
+                    </div>
+                </td>
+            </tr> {% empty %} <tr>
+                <td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-muted);"> {% trans "No
+                    content found." %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination (Simple) -->
+{% if is_paginated %}
+<div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.5rem;">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&type={{ current_type }}&status={{ current_status }}" class="btn"
+        style="padding: 0.25rem 0.75rem;">
+        &laquo; {% trans "Prev" %}
+    </a>
+    {% endif %}
+    <span style="padding: 0.25rem 0.75rem;">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&type={{ current_type }}&status={{ current_status }}" class="btn"
+        style="padding: 0.25rem 0.75rem;">
+        {% trans "Next" %} &raquo;
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

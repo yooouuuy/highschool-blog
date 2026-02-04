@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 4rem auto;">
+    <div class="card">
+        <h2 class="text-center mb-4">{% trans "Edit Profile" %}</h2>
+
+        <div class="text-center mb-4">
+            {% if user.profile_pic %}
+            <img src="{{ user.profile_pic.url }}" alt="Profile Picture"
+                style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+            {% else %}
+            <div
+                style="width: 100px; height: 100px; border-radius: 50%; background-color: var(--border); margin: 0 auto; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                {% trans "No Pic" %}
+            </div>
+            {% endif %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label">{% trans "Real Name" %}</label>
+                <input type="text" value="{{ user.real_name }}" disabled class="form-input"
+                    style="background-color: var(--background); cursor: not-allowed;">
+                <small style="color: var(--text-muted);">{% trans "Real name cannot be changed." %}</small>
+            </div>
+
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <small style="display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 0.25rem;">{{
+                    field.help_text|safe }}</small>
+                {% endif %}
+                {% if field.errors %}
+                <small style="color: var(--danger);">{{ field.errors.0 }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="flex" style="justify-content: space-between; margin-top: 2rem;">
+                <a href="{% url 'home' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+                <button type="submit" class="btn btn-primary">{% trans "Save Changes" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const streamChoices = JSON.parse(document.getElementById('stream-choices-data').textContent).reduce((acc, [val, label]) => {
+        acc[val] = label;
+        return acc;
+    }, {});
+
+    const yearSelect = document.getElementById('id_year');
+    const streamSelect = document.getElementById('id_stream');
+
+    function updateStreams() {
+        const year = yearSelect.value;
+        const currentStream = streamSelect.value;
+
+        streamSelect.innerHTML = '<option value="">---------</option>';
+
+        let validStreams = [];
+        if (year == '1') {
+            validStreams = ['common_science', 'common_literature'];
+        } else if (year == '2' || year == '3') {
+            validStreams = ['math', 'science', 'languages', 'literature', 'management_economics', 'civil_engineering'];
+        } else {
+            validStreams = Object.keys(streamChoices);
+        }
+
+        validStreams.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = streamChoices[s];
+            if (s === currentStream) option.selected = true;
+            streamSelect.appendChild(option);
+        });
+    }
+
+    if (yearSelect && streamSelect) {
+        yearSelect.addEventListener('change', updateStreams);
+        updateStreams();
+    }
+
+    document.querySelectorAll('input, textarea, select').forEach(input => {
+        if (!input.classList.contains('form-input')) {
+            input.classList.add('form-input');
+        }
+    });
+</script>
+{{ stream_choices|json_script:"stream-choices-data" }}
+{% endblock %}

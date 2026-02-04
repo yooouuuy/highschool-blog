@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load i18n moderation_tags %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div class="card" style="padding: 2.5rem;">
+        <div class="flex" style="gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            {% if lesson.year %}<span class="badge badge-year">{% trans "Year" %} {{ lesson.year }}</span>{% endif %}
+            {% if lesson.stream %}<span class="badge badge-stream">{{ lesson.get_stream_display }}</span>{% endif %}
+            {% if lesson.subject %}<span class="badge badge-subject">{{ lesson.get_subject_display }}</span>{% endif %}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+            <h1 class="mb-4" style="font-size: 2.5rem; line-height: 1.2; flex: 1;">{{ lesson.title }}</h1>
+            {% if user.is_authenticated and user != lesson.author %}
+            <button onclick="openReportModal('{{ lesson.id }}', '{% get_content_type_id lesson %}')"
+                style="background:none; border:none; padding:0; cursor:pointer; color: var(--text-muted); margin-top: 0.5rem; display: flex; align-items: center; justify-content: center;"
+                title="{% trans 'Report Lesson' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                    <line x1="4" x2="4" y1="22" y2="15"></line>
+                </svg>
+            </button>
+            {% endif %}
+        </div>
+
+        <div class="flex mb-5"
+            style="color: var(--text-muted); font-size: 0.95rem; border-bottom: 2px solid var(--background); padding-bottom: 1.5rem; align-items: center; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>{% trans "Author:" %} <a href="{% url 'teacher_profile' username=lesson.author.username %}"
+                        style="color: inherit; text-decoration: underline;">{% with author=lesson.author %}{{ author.display_name }}{% endwith %}</a></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>{{ lesson.created_at|date:"F j, Y" }}</span>
+            </div>
+        </div>
+
+        <div class="content" style="font-size: 1.125rem; line-height: 1.8; color: var(--text);">
+            {{ lesson.content|linebreaks }}
+        </div>
+
+        {% if lesson.pdf_file %}
+        <div class="mt-4 p-4"
+            style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="color: var(--primary);">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14.5 2 14.5 7.5 20 7.5"></polyline>
+                </svg>
+                <div>
+                    <h5 style="margin: 0; font-size: 1rem;">{% trans "Attached PDF Document" %}</h5>
+                    <small class="text-muted">{{ lesson.pdf_file.name }}</small>
+                </div>
+            </div>
+            <a href="{{ lesson.pdf_file.url }}" target="_blank" class="btn btn-primary btn-sm" download
+                style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                {% trans "Download PDF" %}
+            </a>
+        </div>
+        {% endif %}
+
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 3rem 0;">
+
+        <div class="comments-section">
+            <h3 class="mb-4">{% trans "Discussion & Questions" %}</h3>
+
+            <div class="mb-5">
+                {% for comment in comments %}
+                <div class="mb-4" style="animation: fadeIn 0.3s ease-out;">
+                    <div style="display: flex; gap: 1rem;">
+                        {% if comment.author.profile_pic %}
+                        <img src="{{ comment.author.profile_pic.url }}" alt="{{ comment.author.username }}"
+                            style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                        <div
+                            style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                            {{ comment.author.username|make_list|first|upper }}
+                        </div>
+                        {% endif %}
+                        <div style="flex: 1;">
+                            <div
+                                style="background: var(--background); padding: 1rem; border-radius: var(--radius); border-top-left-radius: 0;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <h5 style="margin: 0; font-size: 0.95rem;">
+                                        <a href="{% url 'teacher_profile' username=comment.author.username %}"
+                                            style="color: var(--text); font-weight: 600;">{{ comment.author.display_name }}</a>
+                                        {% if comment.author.is_teacher %}
+                                        <span class="badge badge-primary"
+                                            style="font-size: 0.7rem; margin-left: 0.5rem;">{% trans "Teacher" %}</span>
+                                        {% endif %}
+                                    </h5>
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                                        <small class="text-muted">{{ comment.created_at|timesince }} {% trans "ago" %}</small>
+                                        {% if user.is_authenticated and user != comment.author %}
+                                        <button
+                                            onclick="openReportModal('{{ comment.id }}', '{% get_content_type_id comment %}')"
+                                            style="background:none; border:none; padding:0; cursor:pointer; color: var(--text-muted); margin-top: 0.25rem; display: flex; align-items: center; justify-content: center;"
+                                            title="{% trans 'Report' %}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z">
+                                                </path>
+                                                <line x1="4" x2="4" y1="22" y2="15"></line>
+                                            </svg>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div style="font-size: 0.95rem; line-height: 1.5;">
+                                    {{ comment.content|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted mb-4">{% trans "No comments yet. Be the first to start the discussion!" %}</p>
+                {% endfor %}
+            </div>
+
+            <div class="card p-4">
+                <h4 class="mb-3">{% trans "Leave a Reply" %}</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ comment_form.content }}
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="submit" class="btn btn-primary mt-2">{% trans "Post Comment" %}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 flex" style="justify-content: space-between; align-items: center;">
+        <a href="{% url 'lesson_list' %}" class="btn btn-secondary"
+            style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            {% trans "Back to Lessons" %}
+        </a>
+        {% if user.is_staff or user == lesson.author %}
+        {% trans "Are you sure you want to delete this lesson?" as del_msg %} <a
+            href="{% url 'lesson_delete' pk=lesson.pk %}" class="btn btn-secondary"
+            style="color: var(--danger); border-color: var(--danger);"
+            onclick="return confirm('{{ del_msg|escapejs }}');"> {% trans "Delete Lesson" %}
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .content p {
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% include 'moderation/report_modal.html' %}
+{% endblock %}
